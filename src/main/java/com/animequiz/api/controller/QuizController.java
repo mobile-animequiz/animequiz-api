@@ -44,5 +44,10 @@ public class QuizController {
         }
         quizRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+
+
     }
+
+
 }
+
