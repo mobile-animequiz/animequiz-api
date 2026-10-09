@@ -1,27 +1,13 @@
-# AnimeQuiz API
-## Processos para Gerar o Projeto Spring Boot e Testar o Mesmo
+# ⛩AnimeQuiz API — Spring Boot RESTful Service
 
-1. **Geração do Projeto:**
-   Primeiro você entra no site Spring Initializr https://start.spring.io/. Escolho o projeto maven, linguagem java e escolha a versão mais recente do Spring boot.
+API Backend em Java e Spring Boot desenvolvida para gerenciar quizzes de animes, pontuações, usuários e perguntas.
 
-2. **Passos para verificar se a API está rodando no localhost:**
-   Primeiro eu vou até a pasta `src/main/java` e dentro dela eu crio uma pasta chamada `Controller` e na mesma eu posso criar um `HelloController` para testar a minha API.
+---
 
-   Seguindo esse código:
+##  Como Executar o Projeto
 
-   ```java
-   package com.animequiz.api.controller;
-
-   import org.springframework.web.bind.annotation.GetMapping;
-   import org.springframework.web.bind.annotation.RequestMapping;
-   import org.springframework.web.bind.annotation.RestController;
-
-   @RestController
-   @RequestMapping("/api")
-   public class hellocontroller {
-
-       @GetMapping("/hello")
-       public String sayHello() {
-           return "Bem-vindo à API do AnimeQuiz!";
-       }
-   }
+1. Certifique-se de ter o **Java 17+** e o **Maven** instalados.
+2. Clone o repositório:
+   ```bash
+   git clone [https://github.com/mobile-animequiz/animequiz-api.git](https://github.com/mobile-animequiz/animequiz-api.git)
+   cd animequiz-api
