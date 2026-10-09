@@ -1,38 +1,39 @@
 -- =====================================
 -- USERS
 -- =====================================
-INSERT INTO users (username, email) VALUES ('Isaac', 'naruto@gmail.com');
-INSERT INTO users (username, email) VALUES ('Tiago Otaku Fedido', 'sasuke@gmail.com');
-INSERT INTO users (username, email) VALUES ('Monkey', 'luffy@onepiece.com');
+INSERT INTO tb_users (username, email) VALUES ('Naruto Uzumaki', 'naruto@konoha.com');
+INSERT INTO tb_users (username, email) VALUES ('Sasuke Uchiha', 'sasuke@konoha.com');
+INSERT INTO tb_users (username, email) VALUES ('Monkey D. Luffy', 'luffy@onepiece.com');
 
 -- =====================================
--- QUIZZES
+-- QUIZZES (com Enum Difficulty)
 -- =====================================
-INSERT INTO quizzes (title, description) VALUES ('Naruto Shippuden Quiz', 'Teste os seus conhecimentos sobre o universo ninja!');
-INSERT INTO quizzes (title, description) VALUES ('One Piece Quiz', 'Quanto sabe sobre os Piratas do Chapéu de Palha?');
+INSERT INTO tb_quizzes (title, description, difficulty) VALUES ('Naruto Shippuden Quiz', 'Conhecimento ninja!', 'FACIL');
+INSERT INTO tb_quizzes (title, description, difficulty) VALUES ('One Piece Quiz', 'Os Chapéus de Palha!', 'MEDIO');
 
 -- =====================================
 -- QUESTIONS
 -- =====================================
--- Pergunta associada ao Quiz 1 (Naruto)
-INSERT INTO questions (statement, quiz_id) VALUES ('Qual é o grande sonho de Naruto Uzumaki?', 1);
--- Pergunta associada ao Quiz 2 (One Piece)
-INSERT INTO questions (statement, quiz_id) VALUES ('Qual é o nome do golpe mais clássico do Luffy?', 2);
+INSERT INTO tb_questions (statement, quiz_id) VALUES ('Qual é o sonho de Naruto?', 1);
+INSERT INTO tb_questions (statement, quiz_id) VALUES ('Qual é o golpe do Luffy?', 2);
 
 -- =====================================
--- OPTIONS (Alternativas de resposta)
+-- OPTIONS
 -- =====================================
--- Opções para a Pergunta 1
-INSERT INTO options (text, correct, question_id) VALUES ('Ser Hokage', true, 1);
-INSERT INTO options (text, correct, question_id) VALUES ('Ser o Rei dos Piratas', false, 1);
-
--- Opções para a Pergunta 2
-INSERT INTO options (text, correct, question_id) VALUES ('Gomu Gomu no Pistol', true, 2);
-INSERT INTO options (text, correct, question_id) VALUES ('Kamehameha', false, 2);
+INSERT INTO tb_options (text, correct, question_id) VALUES ('Ser Hokage', true, 1);
+INSERT INTO tb_options (text, correct, question_id) VALUES ('Ser Rei dos Piratas', false, 1);
+INSERT INTO tb_options (text, correct, question_id) VALUES ('Gomu Gomu no Pistol', true, 2);
+INSERT INTO tb_options (text, correct, question_id) VALUES ('Kamehameha', false, 2);
 
 -- =====================================
--- SCORES (Pontuações para o Ranking)
+-- SCORES
 -- =====================================
-INSERT INTO scores (points, user_id) VALUES (150, 1);
-INSERT INTO scores (points, user_id) VALUES (120, 2);
-INSERT INTO scores (points, user_id) VALUES (200, 3);
+INSERT INTO tb_scores (points, user_id) VALUES (150, 1);
+INSERT INTO tb_scores (points, user_id) VALUES (120, 2);
+INSERT INTO tb_scores (points, user_id) VALUES (200, 3);
+
+-- =====================================
+-- RELACIONAMENTO N:N (User - Quiz Favoritos)
+-- =====================================
+INSERT INTO tb_user_favorite_quizzes (user_id, quiz_id) VALUES (1, 1);
+INSERT INTO tb_user_favorite_quizzes (user_id, quiz_id) VALUES (3, 2);
