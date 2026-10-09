@@ -1,53 +1,86 @@
 package com.animequiz.api.controller;
 
-import com.animequiz.api.entity.Quiz;
-import com.animequiz.api.repository.QuizRepository;
+import com.animequiz.api.dto.QuizRequest;
+import com.animequiz.api.dto.QuizResponse;
+import com.animequiz.api.entity.Difficulty;
+import com.animequiz.api.service.QuizService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/quizzes")
+@Tag(name = "Quizzes", description = "Endpoints para gerenciamento de Quizzes")
 public class QuizController {
 
-    @Autowired
-    private QuizRepository quizRepository;
+    private final QuizService quizService;
+    private final PagedResourcesAssembler<QuizResponse> pagedAssembler;
 
-    public ResponseEntity<Quiz> create(@RequestBody @Valid Quiz quiz) {
-        Quiz savedQuiz = quizRepository.save(quiz);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
+    public QuizController(QuizService quizService, PagedResourcesAssembler<QuizResponse> pagedAssembler) {
+        this.quizService = quizService;
+        this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Quiz>> listAll(Pageable pageable) {
-        Page<Quiz> quizzes = quizRepository.findAll(pageable);
-        return ResponseEntity.ok(quizzes);
+    @PostMapping
+    @Operation(summary = "Criar um novo Quiz")
+    public ResponseEntity<EntityModel<QuizResponse>> createQuiz(@Valid @RequestBody QuizRequest request) {
+        QuizResponse response = quizService.createQuiz(request);
+        EntityModel<QuizResponse> model = EntityModel.of(response,
+                linkTo(methodOn(QuizController.class).getQuizById(response.id())).withSelfRel(),
+                linkTo(methodOn(QuizController.class).getAllQuizzes(null)).withRel("all-quizzes")
+        );
+        return ResponseEntity.created(URI.create("/quizzes/" + response.id())).body(model);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Quiz> findById(@PathVariable Long id) {
-        Optional<Quiz> quiz = quizRepository.findById(id);
-        return quiz.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    @Operation(summary = "Buscar Quiz por ID")
+    public ResponseEntity<EntityModel<QuizResponse>> getQuizById(@PathVariable Long id) {
+        QuizResponse response = quizService.getQuizById(id);
+        EntityModel<QuizResponse> model = EntityModel.of(response,
+                linkTo(methodOn(QuizController.class).getQuizById(id)).withSelfRel(),
+                linkTo(methodOn(QuizController.class).getAllQuizzes(null)).withRel("all-quizzes"),
+                linkTo(methodOn(QuizController.class).updateQuiz(id, null)).withRel("update"),
+                linkTo(methodOn(QuizController.class).deleteQuiz(id)).withRel("delete")
+        );
+        return ResponseEntity.ok(model);
+    }
+
+    @GetMapping
+    @Operation(summary = "Listar todos os Quizzes (Paginado)")
+    public ResponseEntity<PagedModel<EntityModel<QuizResponse>>> getAllQuizzes(@ParameterObject Pageable pageable) {
+        Page<QuizResponse> page = quizService.getAllQuizzes(pageable);
+        PagedModel<EntityModel<QuizResponse>> model = pagedAssembler.toModel(page,
+                res -> EntityModel.of(res, linkTo(methodOn(QuizController.class).getQuizById(res.id())).withSelfRel())
+        );
+        return ResponseEntity.ok(model);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar Quiz")
+    public ResponseEntity<EntityModel<QuizResponse>> updateQuiz(@PathVariable Long id, @Valid @RequestBody QuizRequest request) {
+        QuizResponse response = quizService.updateQuiz(id, request);
+        EntityModel<QuizResponse> model = EntityModel.of(response,
+                linkTo(methodOn(QuizController.class).getQuizById(id)).withSelfRel()
+        );
+        return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!quizRepository.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        quizRepository.deleteById(id);
+    @Operation(summary = "Deletar Quiz")
+    public ResponseEntity<Void> deleteQuiz(@PathVariable Long id) {
+        quizService.deleteQuiz(id);
         return ResponseEntity.noContent().build();
-
-
     }
-
-
 }
-

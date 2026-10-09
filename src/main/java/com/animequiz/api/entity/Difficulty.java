@@ -1,4 +1,7 @@
 package com.animequiz.api.entity;
 
-public class Dfficulty {
+public enum Difficulty {
+    FACIL,
+    MEDIO,
+    DIFICIL
 }
