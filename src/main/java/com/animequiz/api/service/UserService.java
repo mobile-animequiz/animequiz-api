@@ -79,4 +79,9 @@ public class UserService {
     private UserResponse toResponse(User user) {
         return new UserResponse(user.getId(), user.getUsername(), user.getEmail());
     }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> searchByUsername(String username, Pageable pageable) {
+        return userRepository.findByUsernameContainingIgnoreCase(username, pageable).map(this::toResponse);
+    }
 }

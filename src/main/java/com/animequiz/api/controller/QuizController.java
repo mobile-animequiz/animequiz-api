@@ -67,6 +67,28 @@ public class QuizController {
         return ResponseEntity.ok(model);
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Consulta personalizada: Pesquisar quizzes por título")
+    public ResponseEntity<PagedModel<EntityModel<QuizResponse>>> searchByTitle(
+            @RequestParam String title, @ParameterObject Pageable pageable) {
+        Page<QuizResponse> page = quizService.searchByTitle(title, pageable);
+        PagedModel<EntityModel<QuizResponse>> model = pagedAssembler.toModel(page,
+                res -> EntityModel.of(res, linkTo(methodOn(QuizController.class).getQuizById(res.id())).withSelfRel())
+        );
+        return ResponseEntity.ok(model);
+    }
+
+    @GetMapping("/difficulty/{difficulty}")
+    @Operation(summary = "Consulta personalizada: Listar quizzes por dificuldade")
+    public ResponseEntity<PagedModel<EntityModel<QuizResponse>>> searchByDifficulty(
+            @PathVariable Difficulty difficulty, @ParameterObject Pageable pageable) {
+        Page<QuizResponse> page = quizService.searchByDifficulty(difficulty, pageable);
+        PagedModel<EntityModel<QuizResponse>> model = pagedAssembler.toModel(page,
+                res -> EntityModel.of(res, linkTo(methodOn(QuizController.class).getQuizById(res.id())).withSelfRel())
+        );
+        return ResponseEntity.ok(model);
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar Quiz")
     public ResponseEntity<EntityModel<QuizResponse>> updateQuiz(@PathVariable Long id, @Valid @RequestBody QuizRequest request) {

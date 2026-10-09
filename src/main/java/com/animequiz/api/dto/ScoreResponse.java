@@ -2,7 +2,9 @@ package com.animequiz.api.dto;
 
 public record ScoreResponse(
         Long id,
-        Integer points,
         Long userId,
-        String username
+        String username,
+        Long quizId,
+        String quizTitle,
+        Integer points
 ) {}

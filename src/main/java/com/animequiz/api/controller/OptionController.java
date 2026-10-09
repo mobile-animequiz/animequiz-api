@@ -1,48 +1,94 @@
 package com.animequiz.api.controller;
 
-import com.animequiz.api.entity.Option;
-import com.animequiz.api.repository.OptionRepository;
+import com.animequiz.api.dto.OptionRequest;
+import com.animequiz.api.dto.OptionResponse;
+import com.animequiz.api.service.OptionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.net.URI;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/options")
+@Tag(name = "Opções", description = "Endpoints para gestão das alternativas de resposta")
 public class OptionController {
 
-    @Autowired
-    private OptionRepository optionRepository;
+    private final OptionService optionService;
+    private final PagedResourcesAssembler<OptionResponse> pagedAssembler;
 
-    @PostMapping
-    public ResponseEntity<Option> create(@RequestBody @Valid Option option) {
-        Option saved = optionRepository.save(option);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    public OptionController(OptionService optionService, PagedResourcesAssembler<OptionResponse> pagedAssembler) {
+        this.optionService = optionService;
+        this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Option>> listAll(Pageable pageable) {
-        return ResponseEntity.ok(optionRepository.findAll(pageable));
+    @PostMapping
+    @Operation(summary = "Criar nova opção de resposta")
+    public ResponseEntity<EntityModel<OptionResponse>> createOption(@Valid @RequestBody OptionRequest request) {
+        OptionResponse response = optionService.createOption(request);
+        EntityModel<OptionResponse> model = EntityModel.of(response,
+                linkTo(methodOn(OptionController.class).getOptionById(response.id())).withSelfRel(),
+                linkTo(methodOn(OptionController.class).getAllOptions(null)).withRel("all-options")
+        );
+        return ResponseEntity.created(URI.create("/options/" + response.id())).body(model);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Option> findById(@PathVariable Long id) {
-        Optional<Option> option = optionRepository.findById(id);
-        return option.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    @Operation(summary = "Buscar opção por ID")
+    public ResponseEntity<EntityModel<OptionResponse>> getOptionById(@PathVariable Long id) {
+        OptionResponse response = optionService.getOptionById(id);
+        EntityModel<OptionResponse> model = EntityModel.of(response,
+                linkTo(methodOn(OptionController.class).getOptionById(id)).withSelfRel(),
+                linkTo(methodOn(OptionController.class).getAllOptions(null)).withRel("all-options")
+        );
+        return ResponseEntity.ok(model);
+    }
+
+    @GetMapping
+    @Operation(summary = "Listar todas as opções (Paginado)")
+    public ResponseEntity<PagedModel<EntityModel<OptionResponse>>> getAllOptions(@ParameterObject Pageable pageable) {
+        Page<OptionResponse> page = optionService.getAllOptions(pageable);
+        PagedModel<EntityModel<OptionResponse>> model = pagedAssembler.toModel(page,
+                res -> EntityModel.of(res, linkTo(methodOn(OptionController.class).getOptionById(res.id())).withSelfRel())
+        );
+        return ResponseEntity.ok(model);
+    }
+
+    @GetMapping("/by-question/{questionId}")
+    @Operation(summary = "Consulta personalizada: Listar opções por Questão ID")
+    public ResponseEntity<PagedModel<EntityModel<OptionResponse>>> getOptionsByQuestionId(
+            @PathVariable Long questionId, @ParameterObject Pageable pageable) {
+        Page<OptionResponse> page = optionService.getOptionsByQuestionId(questionId, pageable);
+        PagedModel<EntityModel<OptionResponse>> model = pagedAssembler.toModel(page,
+                res -> EntityModel.of(res, linkTo(methodOn(OptionController.class).getOptionById(res.id())).withSelfRel())
+        );
+        return ResponseEntity.ok(model);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar opção")
+    public ResponseEntity<EntityModel<OptionResponse>> updateOption(@PathVariable Long id, @Valid @RequestBody OptionRequest request) {
+        OptionResponse response = optionService.updateOption(id, request);
+        EntityModel<OptionResponse> model = EntityModel.of(response,
+                linkTo(methodOn(OptionController.class).getOptionById(id)).withSelfRel()
+        );
+        return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!optionRepository.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        optionRepository.deleteById(id);
+    @Operation(summary = "Deletar opção")
+    public ResponseEntity<Void> deleteOption(@PathVariable Long id) {
+        optionService.deleteOption(id);
         return ResponseEntity.noContent().build();
     }
 }

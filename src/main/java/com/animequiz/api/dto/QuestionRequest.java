@@ -2,9 +2,11 @@ package com.animequiz.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 public record QuestionRequest(
-        @NotBlank @Size(min = 5, max = 255) String statement,
-        @NotNull Long quizId
+        @NotNull(message = "O ID do quiz é obrigatório")
+        Long quizId,
+
+        @NotBlank(message = "O texto da questão é obrigatório")
+        String text
 ) {}

@@ -67,6 +67,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
+
     public ResponseEntity<EntityModel<UserResponse>> getUserById(@PathVariable Long id) {
         UserResponse response = userService.getUserById(id);
         EntityModel<UserResponse> model = EntityModel.of(response,
@@ -108,5 +109,16 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Consulta personalizada: Pesquisar utilizadores por username")
+    public ResponseEntity<PagedModel<EntityModel<UserResponse>>> searchByUsername(
+            @RequestParam String username, @ParameterObject Pageable pageable) {
+        Page<UserResponse> page = userService.searchByUsername(username, pageable);
+        PagedModel<EntityModel<UserResponse>> model = pagedAssembler.toModel(page,
+                res -> EntityModel.of(res, linkTo(methodOn(UserController.class).getUserById(res.id())).withSelfRel())
+        );
+        return ResponseEntity.ok(model);
     }
 }
