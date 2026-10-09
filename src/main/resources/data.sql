@@ -28,9 +28,8 @@ INSERT INTO tb_options (text, correct, question_id) VALUES ('Kamehameha', false,
 -- =====================================
 -- SCORES
 -- =====================================
-INSERT INTO tb_scores (points, user_id) VALUES (150, 1);
-INSERT INTO tb_scores (points, user_id) VALUES (120, 2);
-INSERT INTO tb_scores (points, user_id) VALUES (200, 3);
+INSERT INTO tb_scores (points, user_id, quiz_id) VALUES (150, 1, 1);
+INSERT INTO tb_scores (points, user_id, quiz_id) VALUES (200, 2, 1);
 
 -- =====================================
 -- RELACIONAMENTO N:N (User - Quiz Favoritos)
