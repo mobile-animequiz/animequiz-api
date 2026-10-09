@@ -25,9 +25,16 @@ public class Question {
 
     public Question() {}
 
+    // Construtor 1: Texto primeiro, Quiz depois
     public Question(String statement, Quiz quiz) {
         this.statement = statement;
         this.quiz = quiz;
+    }
+
+    // Construtor 2: Quiz primeiro, Texto depois (para cobrir a chamada do Service)
+    public Question(Quiz quiz, String statement) {
+        this.quiz = quiz;
+        this.statement = statement;
     }
 
     public Long getId() { return id; }
@@ -38,4 +45,11 @@ public class Question {
 
     public Quiz getQuiz() { return quiz; }
     public void setQuiz(Quiz quiz) { this.quiz = quiz; }
+
+    public String getText() {
+        return this.statement;
+    }
+    public void setText(String text) {
+        this.statement = text;
+    }
 }

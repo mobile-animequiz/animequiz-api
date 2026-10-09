@@ -13,22 +13,30 @@ public class Option {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O texto da alternativa é obrigatório")
-    @Size(min = 1, max = 150, message = "O texto deve ter até 150 caracteres")
+    @NotBlank(message = "O texto da opção é obrigatório")
+    @Size(max = 150, message = "O texto deve ter no máximo 150 caracteres")
     @Column(nullable = false)
     private String text;
 
-    @NotNull(message = "Deve informar se a opção é correta ou não")
+    @NotNull(message = "A indicação de corretude é obrigatória")
     @Column(nullable = false)
     private Boolean correct;
 
-    @NotNull(message = "A pergunta associada é obrigatória")
+    @NotNull(message = "A questão associada é obrigatória")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
     public Option() {}
 
+    // Construtor exigido pelo OptionService (Question primeiro)
+    public Option(Question question, String text, Boolean correct) {
+        this.question = question;
+        this.text = text;
+        this.correct = correct;
+    }
+
+    // Construtor alternativo (caso necessário)
     public Option(String text, Boolean correct, Question question) {
         this.text = text;
         this.correct = correct;
@@ -43,6 +51,10 @@ public class Option {
 
     public Boolean getCorrect() { return correct; }
     public void setCorrect(Boolean correct) { this.correct = correct; }
+
+    // Métodos de compatibilidade para o serviço
+    public Boolean getIsCorrect() { return correct; }
+    public void setIsCorrect(Boolean correct) { this.correct = correct; }
 
     public Question getQuestion() { return question; }
     public void setQuestion(Question question) { this.question = question; }

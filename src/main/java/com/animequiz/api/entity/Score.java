@@ -17,16 +17,27 @@ public class Score {
     @Column(nullable = false)
     private Integer points;
 
-    @NotNull(message = "O usuário associado é obrigatório")
+    @NotNull(message = "O utilizador associado é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @NotNull(message = "O quiz associado é obrigatório")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quiz_id", nullable = false)
+    private Quiz quiz;
 
     public Score() {}
 
     public Score(Integer points, User user) {
         this.points = points;
         this.user = user;
+    }
+
+    public Score(User user, Quiz quiz, Integer points) {
+        this.user = user;
+        this.quiz = quiz;
+        this.points = points;
     }
 
     public Long getId() { return id; }
@@ -37,4 +48,7 @@ public class Score {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    public Quiz getQuiz() { return quiz; }
+    public void setQuiz(Quiz quiz) { this.quiz = quiz; }
 }
