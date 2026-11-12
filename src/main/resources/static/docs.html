@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Anime Quiz API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/swagger-ui/swagger-ui.css">
+    <style>
+        :root {
+            --fundo:#0a0a0f;
+            --painel:rgba(8,8,12,.86);
+            --linha:rgba(255,255,255,.14);
+            --texto:#f4f4f8;
+            --suave:#c4c4d2;
+            --destaque:#ff5a60;
+        }
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--fundo); color:var(--texto);
+            font-family:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif; }
+
+        /* video ao fundo */
+        .video-fundo { position:fixed; inset:0; z-index:-2; overflow:hidden; background:#000; }
+        .video-fundo iframe { position:absolute; top:50%; left:50%; border:0; pointer-events:none;
+            width:max(100vw,177.78vh); height:max(100vh,56.25vw); transform:translate(-50%,-50%); }
+        .veu { position:fixed; inset:0; z-index:-1;
+            background:linear-gradient(rgba(8,8,12,.55), rgba(8,8,12,.30) 40%, rgba(8,8,12,.55)); }
+
+        /* cabecalho */
+        .cabecalho { max-width:1100px; margin:0 auto; padding:56px 24px 0; text-shadow:0 2px 14px rgba(0,0,0,.6); }
+        .cabecalho small { display:block; font-size:.75rem; font-weight:700; letter-spacing:.18em;
+            text-transform:uppercase; color:var(--destaque); margin-bottom:10px; }
+        .cabecalho h1 { margin:0; font-size:2.6rem; font-weight:800; letter-spacing:-.02em; color:#fff; }
+        .cabecalho p { margin:10px 0 0; color:#f0f0f6; max-width:620px; line-height:1.6; font-weight:500; }
+
+        /* botao de som: so icone */
+        #som { position:fixed; right:24px; bottom:24px; z-index:10; width:44px; height:44px;
+            display:grid; place-items:center; padding:0; cursor:pointer; color:var(--texto);
+            background:rgba(10,10,15,.7); border:1px solid var(--linha); border-radius:50%;
+            backdrop-filter:blur(6px); transition:border-color .2s, color .2s; }
+        #som:hover { border-color:var(--destaque); color:#fff; }
+        #som svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2;
+            stroke-linecap:round; stroke-linejoin:round; }
+        #som .on { display:none; }
+        #som.ligado .on { display:block; }
+        #som.ligado .off { display:none; }
+
+        /* painel do swagger */
+        #swagger-ui { max-width:1100px; margin:32px auto 64px; padding:8px 24px 24px;
+            background:var(--painel); backdrop-filter:blur(5px);
+            border:1px solid var(--linha); border-radius:6px; }
+        .swagger-ui { font-family:'Manrope',system-ui,sans-serif; color:var(--texto); }
+        .swagger-ui .topbar { display:none; }
+        .swagger-ui .info { margin:28px 0 12px; }
+        .swagger-ui .info .title { color:#fff; font-size:1.8rem; font-weight:800; letter-spacing:-.01em; }
+        .swagger-ui .info .title small, .swagger-ui .info .title small.version-stamp { background:#2a2a36; }
+        .swagger-ui .info p, .swagger-ui .info li, .swagger-ui .info table,
+        .swagger-ui .renderedMarkdown p { color:#f0f0f6; line-height:1.7; font-size:15px; }
+        .swagger-ui .info a { color:var(--destaque); }
+        .swagger-ui .markdown code, .swagger-ui .renderedMarkdown code {
+            background:rgba(255,255,255,.1); color:#ffc9cb; border-radius:3px; padding:1px 6px; }
+
+        .swagger-ui .scheme-container { background:transparent; box-shadow:none; padding:16px 0; border-bottom:1px solid var(--linha); }
+        .swagger-ui .servers > label select { background:#14141c; color:var(--texto); border:1px solid var(--linha); border-radius:4px; }
+        .swagger-ui label, .swagger-ui .servers-title { color:var(--suave); font-weight:600; }
+
+        /* grupos */
+        .swagger-ui h3, .swagger-ui h4, .swagger-ui h5 { color:#fff; }
+        .swagger-ui .opblock-tag { color:#fff; font-weight:700; border-bottom:1px solid var(--linha); }
+        .swagger-ui .opblock-tag small, .swagger-ui .opblock-tag-section .markdown p { color:var(--suave); }
+        .swagger-ui .opblock-tag:hover { background:rgba(255,255,255,.04); }
+        .swagger-ui .expand-operation svg, .swagger-ui .opblock-tag svg { fill:var(--suave); }
+
+        /* rotas */
+        .swagger-ui .opblock { background:rgba(255,255,255,.04); border:1px solid var(--linha);
+            border-left-width:3px; border-radius:4px; box-shadow:none; margin:0 0 8px; }
+        .swagger-ui .opblock:hover { background:rgba(255,255,255,.06); }
+        .swagger-ui .opblock .opblock-summary { border-bottom:0; }
+        .swagger-ui .opblock .opblock-summary-method { border-radius:3px; font-weight:700; min-width:64px; box-shadow:none; }
+        .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-path__deprecated { color:#fff; font-weight:600; }
+        .swagger-ui .opblock .opblock-summary-description { color:var(--suave); }
+        .swagger-ui .opblock .opblock-section-header { background:rgba(255,255,255,.05); box-shadow:none; }
+        .swagger-ui .opblock .opblock-section-header h4, .swagger-ui .opblock-description-wrapper p,
+        .swagger-ui .opblock-external-docs-wrapper p { color:var(--texto); }
+
+        .swagger-ui .opblock.opblock-get    { border-color:var(--linha); border-left-color:#5b8def; }
+        .swagger-ui .opblock.opblock-get .opblock-summary-method    { background:#5b8def; }
+        .swagger-ui .opblock.opblock-post   { border-color:var(--linha); border-left-color:#3fa876; }
+        .swagger-ui .opblock.opblock-post .opblock-summary-method   { background:#3fa876; }
+        .swagger-ui .opblock.opblock-put    { border-color:var(--linha); border-left-color:#c9922e; }
+        .swagger-ui .opblock.opblock-put .opblock-summary-method    { background:#c9922e; }
+        .swagger-ui .opblock.opblock-delete { border-color:var(--linha); border-left-color:#d25b5b; }
+        .swagger-ui .opblock.opblock-delete .opblock-summary-method { background:#d25b5b; }
+        .swagger-ui .opblock.opblock-patch  { border-color:var(--linha); border-left-color:#8b6fd6; }
+        .swagger-ui .opblock.opblock-patch .opblock-summary-method  { background:#8b6fd6; }
+
+        /* tabelas e campos */
+        .swagger-ui table thead tr th, .swagger-ui table thead tr td { color:var(--suave); border-bottom:1px solid var(--linha); }
+        .swagger-ui .parameter__name, .swagger-ui .response-col_status, .swagger-ui .tab li { color:var(--texto); }
+        .swagger-ui .parameter__type, .swagger-ui .parameter__in, .swagger-ui .response-col_links { color:var(--suave); }
+        .swagger-ui input[type=text], .swagger-ui input[type=password], .swagger-ui input[type=email],
+        .swagger-ui select, .swagger-ui textarea { background:#14141c; color:var(--texto);
+            border:1px solid var(--linha); border-radius:4px; }
+        .swagger-ui .highlight-code > .microlight, .swagger-ui .microlight { background:#0f0f16 !important; border-radius:4px; }
+
+        /* botoes */
+        .swagger-ui .btn { border-radius:4px; box-shadow:none; font-weight:700; transition:background .2s, border-color .2s; }
+        .swagger-ui .btn.execute { background:var(--destaque); border-color:var(--destaque); color:#fff; }
+        .swagger-ui .btn.execute:hover { background:#ff7075; }
+        .swagger-ui .btn.cancel { border-color:var(--suave); color:var(--suave); }
+        .swagger-ui .btn.authorize { color:var(--texto); border-color:var(--texto); background:transparent; }
+        .swagger-ui .btn.authorize svg { fill:var(--texto); }
+        .swagger-ui .btn.authorize:hover { border-color:var(--destaque); color:#fff; }
+
+        /* modelos */
+        .swagger-ui section.models { border:1px solid var(--linha); border-radius:4px; }
+        .swagger-ui section.models h4 { color:#fff; }
+        .swagger-ui section.models .model-container { background:rgba(255,255,255,.04); border-radius:4px; }
+        .swagger-ui .model, .swagger-ui .model-title, .swagger-ui .prop-type { color:var(--texto); }
+        .swagger-ui .prop-format { color:var(--suave); }
+
+        /* janela de login */
+        .swagger-ui .dialog-ux .modal-ux { background:#14141c; border:1px solid var(--linha); border-radius:6px; }
+        .swagger-ui .dialog-ux .modal-ux-header { border-bottom:1px solid var(--linha); }
+        .swagger-ui .dialog-ux .modal-ux-header h3, .swagger-ui .dialog-ux .modal-ux-content p,
+        .swagger-ui .dialog-ux .modal-ux-content h4 { color:#fff; }
+
+        ::-webkit-scrollbar { width:10px; }
+        ::-webkit-scrollbar-track { background:var(--fundo); }
+        ::-webkit-scrollbar-thumb { background:#2e2e3a; border-radius:99px; }
+        ::-webkit-scrollbar-thumb:hover { background:var(--destaque); }
+
+        @media (max-width:700px) {
+            .cabecalho h1 { font-size:2rem; }
+            #swagger-ui { margin:20px 12px 64px; padding:8px 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="video-fundo"><div id="yt"></div></div>
+<div class="veu"></div>
+
+<header class="cabecalho">
+    <small>Documentação da API</small>
+    <h1>Anime Quiz API</h1>
+    <p>Contas, quizzes, questões e pontuações. Autentique-se com JWT para testar as rotas protegidas.</p>
+</header>
+
+<button id="som" aria-label="Ligar ou desligar o som" title="Som">
+    <svg class="off" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+    <svg class="on" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+</button>
+
+<div id="swagger-ui"></div>
+
+<script src="/swagger-ui/swagger-ui-bundle.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+    SwaggerUIBundle({ url: '/api-docs', dom_id: '#swagger-ui', deepLinking: false, filter: true });
+
+    // Segundo do video onde a musica "comeca de verdade". Ajuste este numero.
+    const INICIO = 20;
+    const VIDEO_ID = 'ORYjr3ApwD0';
+    let player;
+    const btn = document.getElementById('som');
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('yt', {
+            videoId: VIDEO_ID,
+            playerVars: { autoplay:1, controls:0, modestbranding:1, playsinline:1, rel:0, start:INICIO },
+            events: {
+                onReady: e => { e.target.mute(); e.target.seekTo(INICIO, true); e.target.playVideo(); },
+                onStateChange: e => {
+                    if (e.data === YT.PlayerState.ENDED) { player.seekTo(INICIO, true); player.playVideo(); }
+                }
+            }
+        });
+    }
+
+    btn.onclick = () => {
+        if (!player) return;
+        if (player.isMuted()) { player.unMute(); player.playVideo(); btn.classList.add('ligado'); }
+        else { player.mute(); btn.classList.remove('ligado'); }
+    };
+</script>
+</body>
+</html>
