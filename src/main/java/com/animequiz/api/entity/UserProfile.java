@@ -11,7 +11,8 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    // LAZY: o padrão EAGER do @OneToOne gerava uma consulta extra por perfil nas listagens (N+1).
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 

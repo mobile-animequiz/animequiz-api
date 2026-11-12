@@ -24,14 +24,10 @@ public class Question {
     private Quiz quiz;
 
     public Question() {}
-
-    // Construtor 1: Texto primeiro, Quiz depois
     public Question(String statement, Quiz quiz) {
         this.statement = statement;
         this.quiz = quiz;
     }
-
-    // Construtor 2: Quiz primeiro, Texto depois (para cobrir a chamada do Service)
     public Question(Quiz quiz, String statement) {
         this.quiz = quiz;
         this.statement = statement;

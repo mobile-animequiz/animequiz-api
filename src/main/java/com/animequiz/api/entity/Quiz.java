@@ -27,12 +27,18 @@ public class Quiz {
     @Column(nullable = false)
     private Difficulty difficulty;
 
+    @NotNull(message = "A categoria é obrigatória")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
     public Quiz() {}
 
-    public Quiz(String title, String description, Difficulty difficulty) {
+    public Quiz(String title, String description, Difficulty difficulty, Category category) {
         this.title = title;
         this.description = description;
         this.difficulty = difficulty;
+        this.category = category;
     }
 
     public Long getId() { return id; }
@@ -46,4 +52,7 @@ public class Quiz {
 
     public Difficulty getDifficulty() { return difficulty; }
     public void setDifficulty(Difficulty difficulty) { this.difficulty = difficulty; }
+
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 }

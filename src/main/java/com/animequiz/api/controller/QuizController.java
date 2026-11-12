@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/quizzes")
-@Tag(name = "Quizzes", description = "Endpoints para gerenciamento de Quizzes")
+@Tag(name = "Quizzes", description = "Gerenciamento de quizzes")
 public class QuizController {
 
     private final QuizService quizService;
@@ -34,7 +34,7 @@ public class QuizController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar um novo Quiz")
+    @Operation(summary = "Criar quiz")
     public ResponseEntity<EntityModel<QuizResponse>> createQuiz(@Valid @RequestBody QuizRequest request) {
         QuizResponse response = quizService.createQuiz(request);
         EntityModel<QuizResponse> model = EntityModel.of(response,
@@ -45,7 +45,7 @@ public class QuizController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar Quiz por ID")
+    @Operation(summary = "Buscar quiz por ID")
     public ResponseEntity<EntityModel<QuizResponse>> getQuizById(@PathVariable Long id) {
         QuizResponse response = quizService.getQuizById(id);
         EntityModel<QuizResponse> model = EntityModel.of(response,
@@ -58,7 +58,7 @@ public class QuizController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todos os Quizzes (Paginado)")
+    @Operation(summary = "Listar quizzes (paginado)")
     public ResponseEntity<PagedModel<EntityModel<QuizResponse>>> getAllQuizzes(@ParameterObject Pageable pageable) {
         Page<QuizResponse> page = quizService.getAllQuizzes(pageable);
         PagedModel<EntityModel<QuizResponse>> model = pagedAssembler.toModel(page,
@@ -90,7 +90,7 @@ public class QuizController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar Quiz")
+    @Operation(summary = "Atualizar quiz")
     public ResponseEntity<EntityModel<QuizResponse>> updateQuiz(@PathVariable Long id, @Valid @RequestBody QuizRequest request) {
         QuizResponse response = quizService.updateQuiz(id, request);
         EntityModel<QuizResponse> model = EntityModel.of(response,
@@ -100,7 +100,7 @@ public class QuizController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar Quiz")
+    @Operation(summary = "Excluir quiz")
     public ResponseEntity<Void> deleteQuiz(@PathVariable Long id) {
         quizService.deleteQuiz(id);
         return ResponseEntity.noContent().build();

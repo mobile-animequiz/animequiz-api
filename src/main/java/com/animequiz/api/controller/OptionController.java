@@ -65,7 +65,9 @@ public class OptionController {
     }
 
     @GetMapping("/by-question/{questionId}")
-    @Operation(summary = "Consulta personalizada: Listar opções por Questão ID")
+    @Operation(summary = "Consulta personalizada: Listar opções por Questão ID",
+            description = "Alternativas da questão em ordem crescente de `id`. Devolve só `id`, `questionId` e `text`: " +
+                    "o gabarito nunca é retornado. Paginado: `size` padrão 20.")
     public ResponseEntity<PagedModel<EntityModel<OptionResponse>>> getOptionsByQuestionId(
             @PathVariable Long questionId, @ParameterObject Pageable pageable) {
         Page<OptionResponse> page = optionService.getOptionsByQuestionId(questionId, pageable);
@@ -86,7 +88,7 @@ public class OptionController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar opção")
+    @Operation(summary = "Excluir opção")
     public ResponseEntity<Void> deleteOption(@PathVariable Long id) {
         optionService.deleteOption(id);
         return ResponseEntity.noContent().build();

@@ -65,7 +65,9 @@ public class QuestionController {
     }
 
     @GetMapping("/by-quiz/{quizId}")
-    @Operation(summary = "Consulta personalizada: Listar questões por Quiz ID")
+    @Operation(summary = "Consulta personalizada: Listar questões por Quiz ID",
+            description = "Questões do quiz em ordem crescente de `id`, sem gabarito e sem alternativas " +
+                    "(as alternativas vêm de `GET /options/by-question/{questionId}`). Paginado: `size` padrão 20.")
     public ResponseEntity<PagedModel<EntityModel<QuestionResponse>>> getQuestionsByQuizId(
             @PathVariable Long quizId, @ParameterObject Pageable pageable) {
         Page<QuestionResponse> page = questionService.getQuestionsByQuizId(quizId, pageable);
@@ -86,7 +88,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar questão")
+    @Operation(summary = "Excluir questão")
     public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();

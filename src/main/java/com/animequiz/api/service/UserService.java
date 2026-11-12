@@ -3,9 +3,11 @@ package com.animequiz.api.service;
 import com.animequiz.api.dto.UserRequest;
 import com.animequiz.api.dto.UserResponse;
 import com.animequiz.api.entity.User;
+import com.animequiz.api.entity.UserProfile;
 import com.animequiz.api.exception.ConflictException;
 import com.animequiz.api.exception.ResourceNotFoundException;
 import com.animequiz.api.repository.ScoreRepository;
+import com.animequiz.api.repository.UserProfileRepository;
 import com.animequiz.api.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +19,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ScoreRepository scoreRepository;
+    private final UserProfileRepository userProfileRepository;
 
-    public UserService(UserRepository userRepository, ScoreRepository scoreRepository) {
+    public UserService(UserRepository userRepository, ScoreRepository scoreRepository,
+                       UserProfileRepository userProfileRepository) {
         this.userRepository = userRepository;
         this.scoreRepository = scoreRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     @Transactional
@@ -34,6 +39,8 @@ public class UserService {
 
         User user = new User(request.username(), request.email());
         User saved = userRepository.save(user);
+        // Todo usuário nasce com um perfil (vazio), na mesma transação: o app consulta o perfil sempre.
+        userProfileRepository.save(new UserProfile(saved, null, null));
         return toResponse(saved);
     }
 
@@ -54,6 +61,10 @@ public class UserService {
         if (!user.getEmail().equalsIgnoreCase(request.email()) && userRepository.existsByEmailIgnoreCase(request.email())) {
             throw new ConflictException("Já existe um usuário com o e-mail: " + request.email());
         }
+        // Antes só o e-mail era checado: um username repetido estourava a unique do banco (HTTP 500).
+        if (!user.getUsername().equalsIgnoreCase(request.username()) && userRepository.existsByUsernameIgnoreCase(request.username())) {
+            throw new ConflictException("Nome de usuário já em uso: " + request.username());
+        }
 
         user.setUsername(request.username());
         user.setEmail(request.email());
@@ -67,6 +78,10 @@ public class UserService {
         }
         if (scoreRepository.existsByUserId(id)) {
             throw new ConflictException("Não é possível deletar usuário que possui pontuações (scores) registradas");
+        }
+        // Antes a FK do perfil estourava como HTTP 500; agora segue a mesma regra de dependentes (409).
+        if (userProfileRepository.existsByUserId(id)) {
+            throw new ConflictException("Não é possível deletar usuário que possui perfil; remova o perfil primeiro");
         }
         userRepository.deleteById(id);
     }

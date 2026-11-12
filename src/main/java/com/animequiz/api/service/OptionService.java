@@ -49,7 +49,7 @@ public class OptionService {
         if (!questionRepository.existsById(questionId)) {
             throw new ResourceNotFoundException("Questão não encontrada com ID: " + questionId);
         }
-        return optionRepository.findByQuestionId(questionId, pageable).map(this::toResponse);
+        return optionRepository.findByQuestionIdOrderByIdAsc(questionId, pageable).map(this::toResponse);
     }
 
     @Transactional
@@ -62,7 +62,7 @@ public class OptionService {
 
         option.setQuestion(question);
         option.setText(request.text());
-        option.setIsCorrect(request.isCorrect());
+        option.setCorrect(request.isCorrect());
 
         return toResponse(optionRepository.save(option));
     }
@@ -75,12 +75,12 @@ public class OptionService {
         optionRepository.deleteById(id);
     }
 
+    // O gabarito (Option.correct) nunca é copiado para a resposta.
     private OptionResponse toResponse(Option option) {
         return new OptionResponse(
                 option.getId(),
                 option.getQuestion().getId(),
-                option.getText(),
-                option.getIsCorrect()
+                option.getText()
         );
     }
 }

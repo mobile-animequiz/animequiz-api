@@ -21,7 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/profiles")
-@Tag(name = "Perfis de Utilizador", description = "Endpoints para gestão dos perfis detalhados")
+@Tag(name = "Perfis", description = "Endpoints para gestão dos perfis detalhados")
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
@@ -33,7 +33,7 @@ public class UserProfileController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar perfil de utilizador")
+    @Operation(summary = "Criar perfil de usuário")
     public ResponseEntity<EntityModel<UserProfileResponse>> createUserProfile(@Valid @RequestBody UserProfileRequest request) {
         UserProfileResponse response = userProfileService.createUserProfile(request);
         EntityModel<UserProfileResponse> model = EntityModel.of(response,
@@ -76,7 +76,7 @@ public class UserProfileController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar perfil de utilizador")
+    @Operation(summary = "Atualizar perfil de usuário")
     public ResponseEntity<EntityModel<UserProfileResponse>> updateUserProfile(@PathVariable Long id, @Valid @RequestBody UserProfileRequest request) {
         UserProfileResponse response = userProfileService.updateUserProfile(id, request);
         EntityModel<UserProfileResponse> model = EntityModel.of(response,
@@ -86,7 +86,7 @@ public class UserProfileController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Deletar perfil de utilizador")
+    @Operation(summary = "Excluir perfil de usuário")
     public ResponseEntity<Void> deleteUserProfile(@PathVariable Long id) {
         userProfileService.deleteUserProfile(id);
         return ResponseEntity.noContent().build();

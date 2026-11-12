@@ -18,6 +18,7 @@ public class Option {
     @Column(nullable = false)
     private String text;
 
+    /** Gabarito. Nunca deve ser exposto em respostas da API (ver OptionResponse). */
     @NotNull(message = "A indicação de corretude é obrigatória")
     @Column(nullable = false)
     private Boolean correct;
@@ -28,15 +29,11 @@ public class Option {
     private Question question;
 
     public Option() {}
-
-    // Construtor exigido pelo OptionService (Question primeiro)
     public Option(Question question, String text, Boolean correct) {
         this.question = question;
         this.text = text;
         this.correct = correct;
     }
-
-    // Construtor alternativo (caso necessário)
     public Option(String text, Boolean correct, Question question) {
         this.text = text;
         this.correct = correct;
@@ -51,10 +48,6 @@ public class Option {
 
     public Boolean getCorrect() { return correct; }
     public void setCorrect(Boolean correct) { this.correct = correct; }
-
-    // Métodos de compatibilidade para o serviço
-    public Boolean getIsCorrect() { return correct; }
-    public void setIsCorrect(Boolean correct) { this.correct = correct; }
 
     public Question getQuestion() { return question; }
     public void setQuestion(Question question) { this.question = question; }
