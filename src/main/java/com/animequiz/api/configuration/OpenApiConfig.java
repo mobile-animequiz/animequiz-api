@@ -68,18 +68,22 @@ import java.util.regex.Pattern;
                         `DIFICIL` = 3). O gabarito não é incluído nas respostas da API.
                         """
         ),
-        servers = {
-                @Server(
-                        url = "http://localhost:{port}",
-                        description = "Servidor local para execução e testes",
-                        variables = @ServerVariable(
-                                name = "port",
-                                defaultValue = "8080",
-                                allowableValues = {"8080", "8081"},
-                                description = "Porta HTTP da aplicação (server.port)"
-                        )
+servers = {
+        @Server(
+                url = "https://animequiz-api-wst8.onrender.com",
+                description = "Servidor de produção (Render)"
+        ),
+        @Server(
+                url = "http://localhost:{port}",
+                description = "Servidor local para execução e testes",
+                variables = @ServerVariable(
+                        name = "port",
+                        defaultValue = "8080",
+                        allowableValues = {"8080", "8081"},
+                        description = "Porta HTTP da aplicação (server.port)"
                 )
-        },
+        )
+},
         tags = {
                 @Tag(name = "Usuários", description = """
                         Cadastro e gestão de usuários.
