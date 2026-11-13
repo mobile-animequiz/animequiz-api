@@ -1,4 +1,4 @@
-# Anime Quiz API — Relatório técnico da Etapa 2
+# Anime Quiz API 
 
 ## Escopo
 
