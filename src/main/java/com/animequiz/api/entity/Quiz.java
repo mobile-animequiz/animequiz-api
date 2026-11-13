@@ -32,6 +32,9 @@ public class Quiz {
     @Column(nullable = false)
     private Category category;
 
+    @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY)
+    private java.util.Set<Question> questions = new java.util.HashSet<>();
+
     public Quiz() {}
 
     public Quiz(String title, String description, Difficulty difficulty, Category category) {

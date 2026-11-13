@@ -272,3 +272,11 @@ src/test/java
 ## Histórico
 
 Consulte [CHANGELOG.md](CHANGELOG.md) para o histórico de alterações e decisões técnicas.
+
+## Parte 2 — recursos avançados (entrega acadêmica)
+
+Os exemplos demonstráveis de `X-API-Version`, `X-API-Key`, `X-Idempotency-Key`, rate limiting e CORS estão descritos no arquivo [GUIA_RECURSOS_AVANCADOS.md](GUIA_RECURSOS_AVANCADOS.md).
+
+Importe a coleção [POSTMAN_PARTE2_ANIME_QUIZ.json](POSTMAN_PARTE2_ANIME_QUIZ.json) no Postman e preencha as variáveis `baseUrl`, `token` e `apiKey` conforme o cenário.
+
+**Compatibilidade:** o JWT e os endpoints usados pelo aplicativo mobile permanecem ativos; `X-Idempotency-Key` é opcional, não exigido pelos clientes antigos. As novas garantias de idempotência e rate limiting são adequadas a uma instância com H2 em memória e não substituem um mecanismo distribuído.

@@ -1,0 +1,242 @@
+{
+  "info": {
+    "name": "Anime Quiz - Parte 2 Recursos Avancados",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Status v1 (header ausente)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/versioned/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "versioned",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Status v2 (X-API-Version)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Version",
+            "value": "2",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/versioned/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "versioned",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Versionamento invalido (400)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Version",
+            "value": "3",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/versioned/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "versioned",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Gerar API Key (JWT)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api-keys",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-keys"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Listar minhas API Keys (JWT)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api-keys?page=0&size=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-keys?page=0&size=10"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Validar API Key",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api-keys/verify",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-keys",
+            "verify"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Revogar API Key",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api-keys/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-keys",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Tentativa idempotente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "teste-tentativa-0001",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/quizzes/{{quizId}}/attempts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "quizzes",
+            "{{quizId}}",
+            "attempts"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": 1,\n      \"optionId\": 1\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Rate limit - repetir",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/hello",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "hello"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "apiKey",
+      "value": ""
+    },
+    {
+      "key": "quizId",
+      "value": "1"
+    }
+  ]
+}

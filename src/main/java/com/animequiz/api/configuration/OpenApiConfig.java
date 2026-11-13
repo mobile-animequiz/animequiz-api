@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.servers.ServerVariable;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -45,7 +46,10 @@ import java.util.regex.Pattern;
  * Não declare um {@code @Bean OpenAPI} em paralelo, pois ele sobrepõe estas anotações.
  */
 @Configuration
-@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
+@SecuritySchemes({
+        @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT"),
+        @SecurityScheme(name = "apiKeyAuth", type = SecuritySchemeType.APIKEY, in = io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER, paramName = "X-API-Key")
+})
 @OpenAPIDefinition(
         info = @Info(
                 title = "Anime Quiz API",
@@ -196,16 +200,25 @@ public class OpenApiConfig {
                     .scheme("bearer")
                     .bearerFormat("JWT"));
 
+            components.addSecuritySchemes("apiKeyAuth", new io.swagger.v3.oas.models.security.SecurityScheme()
+                    .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.APIKEY)
+                    .in(io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER)
+                    .name("X-API-Key"));
+
             // O APIError não é referenciado por nenhum controller, então precisa ser registrado à mão.
             ModelConverters.getInstance().readAll(APIError.class).forEach(components::addSchemas);
 
             if (openApi.getPaths() != null) {
                 openApi.getPaths().forEach((path, item) ->
                         item.readOperationsMap().forEach((method, operation) -> {
+                            boolean keyEndpoint = path.equals("/api-keys/verify");
                             boolean admin = requiresAdmin(path, method);
                             boolean secured = admin || requiresAuthentication(path, method);
                             boolean alreadyHasBearer = operation.getSecurity() != null
                                     && operation.getSecurity().stream().anyMatch(requirement -> requirement.containsKey("bearerAuth"));
+                            if (keyEndpoint) {
+                                operation.addSecurityItem(new SecurityRequirement().addList("apiKeyAuth"));
+                            }
                             if (secured && !alreadyHasBearer) {
                                 operation.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
                             }
@@ -292,11 +305,12 @@ public class OpenApiConfig {
                     "Unsupported Media Type: o corpo deve ser enviado como application/json",
                     "Tipo de conteúdo não suportado"));
         }
+        responses.putIfAbsent("429", error(429, "Too Many Requests", "Rate limit por IP excedido; consultar Retry-After", "Limite de requisicoes excedido"));
         responses.putIfAbsent("500", internalError());
     }
 
     private static boolean requiresAdmin(String path, PathItem.HttpMethod method) {
-        if (path.startsWith("/auth/") || path.equals(ATTEMPTS_PATH)) return false;
+        if (path.startsWith("/auth/") || path.equals(ATTEMPTS_PATH) || path.startsWith("/api-keys")) return false;
         if (path.startsWith("/profiles")) return true;
         if (path.startsWith("/users")) {
             return !path.equals("/users/me") && !path.equals("/users/{userId}/profile");
@@ -305,7 +319,7 @@ public class OpenApiConfig {
     }
 
     private static boolean requiresAuthentication(String path, PathItem.HttpMethod method) {
-        if (path.equals("/users/me") || path.equals("/users/{userId}/profile")
+        if ((path.startsWith("/api-keys") && !path.equals("/api-keys/verify")) || path.equals("/users/me") || path.equals("/users/{userId}/profile")
                 || path.equals("/quizzes/{quizId}/attempts")
                 || (path.startsWith("/scores/") && !path.equals("/scores/ranking"))
                 || path.equals("/scores")) return true;

@@ -2,7 +2,7 @@ package com.animequiz.api.controller;
 
 import com.animequiz.api.dto.AttemptRequest;
 import com.animequiz.api.dto.AttemptResponse;
-import com.animequiz.api.service.AttemptService;
+import com.animequiz.api.service.IdempotentAttemptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,9 +31,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Tag(name = "Quizzes")
 public class AttemptController {
 
-    private final AttemptService attemptService;
+    private final IdempotentAttemptService attemptService;
 
-    public AttemptController(AttemptService attemptService) {
+    public AttemptController(IdempotentAttemptService attemptService) {
         this.attemptService = attemptService;
     }
 
@@ -43,6 +44,8 @@ public class AttemptController {
                     Recebe apenas as alternativas escolhidas. O servidor corrige, calcula a pontuação e registra o score.
 
                     **Autenticação:** exige `Authorization: Bearer <token>`. O usuário é identificado pelo subject do JWT; não envie `userId`.
+
+                    **Idempotência opcional:** envie `X-Idempotency-Key` (8-128 caracteres). Repetições com chave e corpo iguais retornam o mesmo score (200 e `Idempotency-Replayed: true`), sem duplicar o registro. Reuso da chave com outro corpo retorna 409.
 
                     **Regra:** pontos = acertos x 10 x peso da dificuldade (`FACIL` = 1, `MEDIO` = 2, `DIFICIL` = 3).
 
@@ -85,13 +88,18 @@ public class AttemptController {
     public ResponseEntity<EntityModel<AttemptResponse>> submitAttempt(
             @PathVariable Long quizId,
             @Valid @org.springframework.web.bind.annotation.RequestBody AttemptRequest request,
-            @AuthenticationPrincipal Jwt jwt) {
-        AttemptResponse response = attemptService.submit(quizId, Long.parseLong(jwt.getSubject()), request);
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey) {
+        var outcome = attemptService.submit(quizId, Long.parseLong(jwt.getSubject()), request, idempotencyKey);
+        AttemptResponse response = outcome.result();
         EntityModel<AttemptResponse> model = EntityModel.of(response,
                 linkTo(methodOn(ScoreController.class).getScoreById(response.scoreId())).withRel("score"),
                 linkTo(methodOn(QuizController.class).getQuizById(quizId)).withRel("quiz"),
                 linkTo(methodOn(ScoreController.class).getRanking(null)).withRel("ranking")
         );
+        if (outcome.replayed()) {
+            return ResponseEntity.ok().header("Idempotency-Replayed", "true").body(model);
+        }
         return ResponseEntity.created(URI.create("/scores/" + response.scoreId())).body(model);
     }
 }

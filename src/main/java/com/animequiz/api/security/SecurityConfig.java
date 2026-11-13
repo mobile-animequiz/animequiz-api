@@ -76,7 +76,8 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtConverter,
                                              ObjectMapper mapper) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.cors(org.springframework.security.config.Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -85,6 +86,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/register", "/auth/login", "/api/hello",
                                 "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
                                 "/h2-console/**").permitAll()
+                        .requestMatchers("/api/versioned/status", "/api-keys/verify").permitAll()
+                        .requestMatchers("/api-keys/**").authenticated()
                         .requestMatchers("/users/me").authenticated()
                         .requestMatchers("/users/*/profile").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/quizzes/**", "/questions/**", "/options/**", "/scores/ranking").permitAll()
