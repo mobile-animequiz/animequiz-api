@@ -1,5 +1,7 @@
 # Anime Quiz API
 
+> Atualização para a apresentação: consulte [VERSOES_E_FUNCIONALIDADES.md](VERSOES_E_FUNCIONALIDADES.md) para alternar V1/V2 no Swagger e no mobile, usar imagens nas questões e demonstrar cada funcionalidade. No Windows, `./Run-Api.ps1` inicia a API e `./Run-Api.ps1 -Test` executa a suíte.
+
 API REST do **Anime Quiz**, desenvolvida em Java e Spring Boot para atender o aplicativo de quizzes de anime. A API gerencia contas, perfis, quizzes, questões, alternativas e pontuações; a correção das respostas e o cálculo dos pontos acontecem no servidor.
 
 ## Tecnologias
