@@ -93,12 +93,12 @@ class AttemptServiceTest {
 
         lenient().when(quizRepository.findById(1L)).thenReturn(Optional.of(quiz));
         lenient().when(questionRepository.findAllByQuizId(1L)).thenReturn(questions);
-        lenient().when(optionRepository.findAllById(any())).thenAnswer(invocation -> {
+        lenient().doAnswer(invocation -> {
             Iterable<Long> requested = invocation.getArgument(0);
             Set<Long> ids = new HashSet<>();
             requested.forEach(ids::add);
             return options.stream().filter(option -> ids.contains(option.getId())).toList();
-        });
+        }).when(optionRepository).findAllById(any());
     }
 
     private Question question(Long id) {

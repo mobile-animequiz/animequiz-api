@@ -60,11 +60,11 @@ class QuestionServiceTest {
     }
 
     private static OptionView option(long id, String text, long questionId) {
-        OptionView view = mock(OptionView.class);
-        lenient().when(view.getId()).thenReturn(id);
-        lenient().when(view.getText()).thenReturn(text);
-        lenient().when(view.getQuestionId()).thenReturn(questionId);
-        return view;
+        return new OptionView() {
+            public Long getId() { return id; }
+            public String getText() { return text; }
+            public Long getQuestionId() { return questionId; }
+        };
     }
 
     @Test

@@ -57,10 +57,10 @@ class QuizServiceTest {
     }
 
     private static QuizQuestionCount count(long quizId, long total) {
-        QuizQuestionCount row = mock(QuizQuestionCount.class);
-        lenient().when(row.getQuizId()).thenReturn(quizId);
-        lenient().when(row.getTotal()).thenReturn(total);
-        return row;
+        return new QuizQuestionCount() {
+            public Long getQuizId() { return quizId; }
+            public Long getTotal() { return total; }
+        };
     }
 
     @Test

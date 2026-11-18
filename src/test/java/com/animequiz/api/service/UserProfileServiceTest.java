@@ -52,12 +52,12 @@ class UserProfileServiceTest {
     }
 
     private static UserQuizStats quiz(long quizId, int bestPoints, long correctTotal, long answeredTotal) {
-        UserQuizStats stats = mock(UserQuizStats.class);
-        lenient().when(stats.getQuizId()).thenReturn(quizId);
-        lenient().when(stats.getBestPoints()).thenReturn(bestPoints);
-        lenient().when(stats.getCorrectTotal()).thenReturn(correctTotal);
-        lenient().when(stats.getAnsweredTotal()).thenReturn(answeredTotal);
-        return stats;
+        return new UserQuizStats() {
+            public Long getQuizId() { return quizId; }
+            public Integer getBestPoints() { return bestPoints; }
+            public Long getCorrectTotal() { return correctTotal; }
+            public Long getAnsweredTotal() { return answeredTotal; }
+        };
     }
 
     private UserProfileDetailsResponse read() {
