@@ -27,7 +27,8 @@ public class VersionController {
             case "1" -> ResponseEntity.ok().header("X-API-Version", "1")
                     .body(Map.of("status", "ok", "version", "1"));
             case "2" -> ResponseEntity.ok().header("X-API-Version", "2")
-                    .body(Map.of("status", "ok", "version", "2", "service", "animequiz-api", "features", "advanced-api"));
+                    .body(Map.of("status", "ok", "version", "2", "service", "animequiz-api", "features", "advanced-api",
+                            "questionMedia", true, "suggestedQuestionTimer", true));
             default -> ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "X-API-Version deve ser 1 ou 2"));
         };

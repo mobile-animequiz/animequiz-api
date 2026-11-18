@@ -26,6 +26,12 @@ INSERT INTO tb_questions (statement, quiz_id) VALUES ('Qual é a vila de origem 
 INSERT INTO tb_questions (statement, quiz_id) VALUES ('Quem é o espadachim dos Chapéus de Palha?', 2);
 INSERT INTO tb_questions (statement, quiz_id) VALUES ('Qual é o sonho de Luffy?', 2);
 
+-- Imagens ilustrativas do anime; não revelam o gabarito. A V1 não expõe estes campos.
+UPDATE tb_questions SET image_url = 'https://www.posters.de/cdn/shop/files/2026-01-05_Poster-Naruto-Shippuden-Characters-61x91-5cm-GPE6022.jpg?v=1767620022',
+    image_alt_text = 'Personagens de Naruto Shippuden', time_limit_seconds = 30 WHERE quiz_id = 1;
+UPDATE tb_questions SET image_url = 'https://98types.co.uk/cdn/shop/files/modern-minimal-movies98-types-studioone-piece-1999-anime-poster-6430550.jpg?v=1761044351',
+    image_alt_text = 'Pôster ilustrativo do anime One Piece', time_limit_seconds = 30 WHERE quiz_id = 2;
+
 -- =====================================
 -- OPTIONS (a ordem define os IDs: 1 a 16; o gabarito fica só no banco, nunca na API)
 -- =====================================

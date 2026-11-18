@@ -18,6 +18,16 @@ public class Question {
     @Column(nullable = false)
     private String statement;
 
+    @Size(max = 1000)
+    @Column(length = 1000)
+    private String imageUrl;
+
+    @Size(max = 255)
+    private String imageAltText;
+
+    @Column(nullable = false, columnDefinition = "integer default 30")
+    private int timeLimitSeconds = 30;
+
     @NotNull(message = "O quiz associado é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id", nullable = false)
@@ -38,6 +48,13 @@ public class Question {
 
     public String getStatement() { return statement; }
     public void setStatement(String statement) { this.statement = statement; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public String getImageAltText() { return imageAltText; }
+    public void setImageAltText(String imageAltText) { this.imageAltText = imageAltText; }
+    public int getTimeLimitSeconds() { return timeLimitSeconds; }
+    public void setTimeLimitSeconds(int timeLimitSeconds) { this.timeLimitSeconds = timeLimitSeconds; }
 
     public Quiz getQuiz() { return quiz; }
     public void setQuiz(Quiz quiz) { this.quiz = quiz; }

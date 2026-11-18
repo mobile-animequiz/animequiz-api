@@ -53,10 +53,17 @@ import java.util.regex.Pattern;
 @OpenAPIDefinition(
         info = @Info(
                 title = "Anime Quiz API",
-                version = "1.0.0",
+                version = "2.0.0",
                 description = """
                         API REST para quizzes de anime. Gerencia contas, perfis, quizzes, questões,
                         alternativas e pontuações. O servidor corrige as tentativas e calcula os pontos.
+
+                        **Versões trocáveis:** selecione V1 ou V2 no Swagger. O cabeçalho `X-API-Version`
+                        acompanha as requisições reais, inclusive do mobile. Sem cabeçalho, o contrato é V1.
+                        Na V2, `GET /quizzes/{quizId}/questions` acrescenta `imageUrl`, `imageAltText`
+                        e `timeLimitSeconds`. As outras operações e a regra de pontuação são compartilhadas.
+                        Valores diferentes de 1 e 2 retornam `400`. O tempo é sugerido para o app, sem
+                        fiscalização no servidor e sem bônus por velocidade.
 
                         **Autenticação:** JWT Bearer. Crie uma conta em `POST /auth/register` ou entre em
                         `POST /auth/login`. Rotas privadas exigem `Authorization: Bearer <token>`.
@@ -73,6 +80,7 @@ import java.util.regex.Pattern;
                         """
         ),
 servers = {
+        @Server(url = "/", description = "Servidor atual (local ou hospedado)"),
         @Server(
                 url = "https://animequiz-api-wst8.onrender.com",
                 description = "Servidor de produção (Render)"

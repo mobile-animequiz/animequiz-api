@@ -4,6 +4,7 @@ import com.animequiz.api.dto.QuestionRequest;
 import com.animequiz.api.dto.OptionSummaryResponse;
 import com.animequiz.api.dto.QuestionResponse;
 import com.animequiz.api.dto.QuestionWithOptionsResponse;
+import com.animequiz.api.dto.QuestionWithMediaResponse;
 import com.animequiz.api.entity.Question;
 import com.animequiz.api.entity.Quiz;
 import com.animequiz.api.exception.ConflictException;
@@ -42,6 +43,7 @@ public class QuestionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Quiz não encontrado com ID: " + request.quizId()));
 
         Question question = new Question(quiz, request.text());
+        applyMedia(question, request);
         return toResponse(questionRepository.save(question));
     }
 
@@ -106,6 +108,7 @@ public class QuestionService {
 
         question.setQuiz(quiz);
         question.setText(request.text());
+        applyMedia(question, request);
 
         return toResponse(questionRepository.save(question));
     }
@@ -129,5 +132,24 @@ public class QuestionService {
                 question.getQuiz().getTitle(),
                 question.getText()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<QuestionWithMediaResponse> getQuestionsWithMediaByQuizId(Long quizId, Pageable pageable) {
+        Page<QuestionWithOptionsResponse> page = getQuestionsWithOptionsByQuizId(quizId, pageable);
+        Map<Long, Question> media = new HashMap<>();
+        questionRepository.findAllById(page.getContent().stream().map(QuestionWithOptionsResponse::id).toList())
+                .forEach(question -> media.put(question.getId(), question));
+        return page.map(question -> {
+            Question stored = media.get(question.id());
+            return new QuestionWithMediaResponse(question.id(), question.quizId(), question.quizTitle(),
+                    question.text(), question.options(), stored.getImageUrl(), stored.getImageAltText(), stored.getTimeLimitSeconds());
+        });
+    }
+
+    private static void applyMedia(Question question, QuestionRequest request) {
+        question.setImageUrl(request.imageUrl());
+        question.setImageAltText(request.imageAltText());
+        question.setTimeLimitSeconds(request.timeLimitSeconds() == null ? 30 : request.timeLimitSeconds());
     }
 }

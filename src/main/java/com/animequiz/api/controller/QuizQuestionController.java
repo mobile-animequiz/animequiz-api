@@ -1,6 +1,7 @@
 package com.animequiz.api.controller;
 
 import com.animequiz.api.dto.QuestionWithOptionsResponse;
+import com.animequiz.api.dto.QuestionWithMediaResponse;
 import com.animequiz.api.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,11 +32,14 @@ public class QuizQuestionController {
 
     private final QuestionService questionService;
     private final PagedResourcesAssembler<QuestionWithOptionsResponse> pagedAssembler;
+    private final PagedResourcesAssembler<QuestionWithMediaResponse> mediaAssembler;
 
     public QuizQuestionController(QuestionService questionService,
-                                  PagedResourcesAssembler<QuestionWithOptionsResponse> pagedAssembler) {
+                                  PagedResourcesAssembler<QuestionWithOptionsResponse> pagedAssembler,
+                                  PagedResourcesAssembler<QuestionWithMediaResponse> mediaAssembler) {
         this.questionService = questionService;
         this.pagedAssembler = pagedAssembler;
+        this.mediaAssembler = mediaAssembler;
     }
 
     @GetMapping
@@ -75,5 +79,19 @@ public class QuizQuestionController {
                 res -> EntityModel.of(res, linkTo(methodOn(QuestionController.class).getQuestionById(res.id())).withSelfRel())
         );
         return ResponseEntity.ok(model);
+    }
+
+    @GetMapping(headers = "X-API-Version=2")
+    @Operation(summary = "Listar questões V2 com imagens e tempo sugerido",
+            description = "Envie X-API-Version: 2. Acrescenta imageUrl, imageAltText e timeLimitSeconds ao contrato V1. "
+                    + "Mídia ausente é null. A imagem não altera a pontuação. O tempo é uma sugestão para a interface; "
+                    + "a API não valida velocidade. Acesso público, paginação e ausência de gabarito iguais à V1. "
+                    + "Quiz inexistente retorna 404; sem questões retorna lista vazia com 200.")
+    public ResponseEntity<PagedModel<EntityModel<QuestionWithMediaResponse>>> getQuizQuestionsV2(
+            @PathVariable Long quizId, @ParameterObject Pageable pageable) {
+        var page = questionService.getQuestionsWithMediaByQuizId(quizId, pageable);
+        return ResponseEntity.ok(mediaAssembler.toModel(page,
+                question -> EntityModel.of(question,
+                        linkTo(methodOn(QuestionController.class).getQuestionById(question.id())).withSelfRel())));
     }
 }
