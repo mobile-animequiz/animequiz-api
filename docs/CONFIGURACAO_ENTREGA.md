@@ -96,8 +96,10 @@ Atrás de proxy, vários usuários podem compartilhar o IP remoto observado. Con
 
 ## Swagger e validação
 
-O histórico identifica e5805bc como introdução da apresentação customizada. /docs.html agora redireciona para /swagger-ui.html: Swagger padrão, sem vídeo, background ou CSS customizado. A escolha V1/V2 e os endpoints foram preservados.
+Tokens JWT inválidos/expirados e sessão ausente retornam APIError em JSON, HTTP 401 e WWW-Authenticate: Bearer, incluindo o filtro OAuth2. O schema de erro não herda o payload de sucesso.
 
-294 testes Java passaram com compilação --release 17 e JUnit Jupiter usando dependências disponíveis localmente. Incluem contratos legados, novos contratos OpenAPI, propriedade das contas, paginação, fotos, Google, reset/expiração/reutilização/revogação, 429, catálogo idempotente e banco fechado/reaberto. O transporte real Google/Resend não foi usado nos testes de integração; são adapters substituídos por mocks. O comando Maven padrão a executar em um ambiente com os plugins disponíveis é mvn test.
+O histórico identifica e5805bc como introdução da apresentação customizada. /, /docs e /docs.html agora redirecionam com HTTP 302/no-store para /swagger-ui.html: Swagger padrão, sem vídeo, background ou CSS customizado. A escolha V1/V2 e os endpoints foram preservados.
+
+297 testes Java passaram com compilação --release 17 e JUnit Jupiter usando dependências disponíveis localmente. Incluem contratos legados, novos contratos OpenAPI, propriedade das contas, paginação, fotos, Google, reset/expiração/reutilização/revogação, 429, catálogo idempotente e banco fechado/reaberto. O transporte real Google/Resend não foi usado nos testes de integração; são adapters substituídos por mocks. O comando Maven padrão a executar em um ambiente com os plugins disponíveis é mvn test.
 
 Pendente nesta entrega: credenciais reais, deploy, migração/exportação da base existente, configuração do volume e teste por rede pública.
