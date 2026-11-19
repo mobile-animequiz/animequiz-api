@@ -48,9 +48,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
         long window = now / windowSeconds;
         // Endereco remoto validado pelo servidor; nao confiar em X-Forwarded-For fornecido pelo cliente.
         String ip = request.getRemoteAddr();
-        Bucket bucket = usage.compute(ip, (key, previous) -> previous == null || previous.window != window
-                ? new Bucket(window, 1) : new Bucket(window, previous.requests + 1));
-        if (usage.size() > 10000) usage.entrySet().removeIf(entry -> entry.getValue().window < window);
+        if (usage.size() >= 10000) usage.entrySet().removeIf(entry -> entry.getValue().window < window);
+        boolean full = usage.size() >= 10000 && !usage.containsKey(ip);
+        Bucket bucket = full ? new Bucket(window, limit + 1)
+                : usage.compute(ip, (key, previous) -> previous == null || previous.window != window
+                    ? new Bucket(window, 1) : new Bucket(window, previous.requests + 1));
         long retryAfter = Math.max(1, (window + 1) * windowSeconds - now);
         response.setHeader("X-RateLimit-Limit", String.valueOf(limit));
         response.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, limit - bucket.requests)));
