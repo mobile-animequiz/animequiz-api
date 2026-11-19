@@ -88,7 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/register", "/auth/login", "/api/hello",
                                 "/auth/google", "/auth/forgot-password", "/auth/reset-password",
                                 "/reset-password.html", "/reset-password.js", "/reset-password.css",
-                                "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
+                                "/", "/docs", "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
                                 "/h2-console/**").permitAll()
                         .requestMatchers("/api/versioned/status", "/api-keys/verify").permitAll()
                         .requestMatchers("/api-keys/**").authenticated()
