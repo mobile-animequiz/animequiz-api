@@ -16,6 +16,8 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<!-- Mockito and Hibernate share this version. Support the JDK 25 bundled with the IDEs. -->
+		<byte-buddy.version>1.18.11</byte-buddy.version>
 	</properties>
 
 	<dependencies>
@@ -70,6 +72,14 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Install instrumentation before Mockito starts; no dynamic self-attachment. -->
+					<argLine>"-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar"</argLine>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
