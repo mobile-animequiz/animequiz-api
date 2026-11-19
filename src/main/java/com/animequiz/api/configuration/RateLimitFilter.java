@@ -39,6 +39,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 || request.getRequestURI().startsWith("/swagger-ui")
                 || request.getRequestURI().startsWith("/api-docs")
                 || request.getRequestURI().equals("/docs.html")
+                || request.getRequestURI().equals("/docs-v2.html")
+                || request.getRequestURI().equals("/docs-version-switch.js")
+                || request.getRequestURI().startsWith("/docs/")
                 || request.getRequestURI().equals("/docs")
                 || request.getRequestURI().equals("/");
     }

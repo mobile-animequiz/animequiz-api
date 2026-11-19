@@ -27,7 +27,9 @@ public class ApiVersionFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         return "OPTIONS".equalsIgnoreCase(request.getMethod())
                 || path.startsWith("/api-docs") || path.startsWith("/swagger-ui")
-                || path.equals("/") || path.equals("/docs") || path.equals("/docs.html") || path.startsWith("/h2-console");
+                || path.equals("/") || path.equals("/docs") || path.startsWith("/docs/")
+                || path.equals("/docs.html") || path.equals("/docs-v2.html") || path.equals("/docs-version-switch.js")
+                || path.startsWith("/h2-console");
     }
 
     @Override
