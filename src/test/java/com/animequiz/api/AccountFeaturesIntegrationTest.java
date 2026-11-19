@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AccountFeaturesIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
+    @Autowired com.animequiz.api.repository.PasswordResetTokenRepository resetTokens;
     @MockBean PasswordMailer mailer;
     @MockBean GoogleIdentityVerifier google;
     @BeforeEach void mailConfiguration() { when(mailer.isConfigured()).thenReturn(true); }
@@ -112,6 +113,19 @@ class AccountFeaturesIntegrationTest {
             .andExpect(status().isOk()).andExpect(jsonPath("$.user.id").value(a.id()));
         mvc.perform(get("/users/me/settings").header("Authorization","Bearer "+a.token()))
             .andExpect(jsonPath("$.googleLinked").value(true));
+    }
+    @Test void expiredResetLinkCannotChangePasswordOrRevokeTheCurrentSession() throws Exception {
+        Session a=register();
+        mvc.perform(post("/auth/forgot-password").contentType(MediaType.APPLICATION_JSON)
+            .content(json.writeValueAsString(Map.of("email",a.email())))).andExpect(status().isAccepted());
+        var link=org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(mailer,timeout(4000)).send(eq(a.email()),link.capture());
+        String token=link.getValue().substring(link.getValue().indexOf("#token=")+7);
+        var saved=resetTokens.findById(a.id()).orElseThrow();
+        resetTokens.save(new com.animequiz.api.entity.PasswordResetToken(a.id(),saved.getTokenHash(),java.time.Instant.now().minusSeconds(1)));
+        mvc.perform(post("/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+            .content(json.writeValueAsString(Map.of("token",token,"password","ExpiredPass9!")))).andExpect(status().isBadRequest());
+        mvc.perform(get("/users/me").header("Authorization","Bearer "+a.token())).andExpect(status().isOk());
     }
     @Test void invalidSettingsNeverChangeTheSavedName() throws Exception {
         Session a=register();

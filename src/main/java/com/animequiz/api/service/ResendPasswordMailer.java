@@ -10,12 +10,19 @@ import java.util.Map;
 public class ResendPasswordMailer implements PasswordMailer {
     private final String key,from;
     private final ObjectMapper mapper;
-    private final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+    private volatile HttpClient http;
+    private HttpClient client() {
+        if (http == null) synchronized (this) {
+            if (http == null) http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+        }
+        return http;
+    }
     public ResendPasswordMailer(@Value("${mail.api-key:}") String key,@Value("${mail.from:}") String from,ObjectMapper mapper) {
         this.key=key; this.from=from; this.mapper=mapper;
     }
     public boolean isConfigured() { return !key.isBlank() && !from.isBlank(); }
     public void send(String recipient,String url) throws Exception {
+        if (!isConfigured()) throw new IllegalStateException("Serviço de e-mail não configurado");
         String content="Você solicitou uma nova senha do AnimeQuiz. Este link vale por 15 minutos e só pode ser usado uma vez:\n"
             +url+"\n\nSe não foi você, ignore esta mensagem. Sua senha continua a mesma.";
         var request=HttpRequest.newBuilder(URI.create("https://api.resend.com/emails"))
@@ -23,7 +30,7 @@ public class ResendPasswordMailer implements PasswordMailer {
             .header("Content-Type","application/json")
             .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(Map.of(
                 "from",from,"to",new String[]{recipient},"subject","AnimeQuiz — redefinir senha","text",content)))).build();
-        var response=http.send(request,HttpResponse.BodyHandlers.discarding());
+        var response=client().send(request,HttpResponse.BodyHandlers.discarding());
         if(response.statusCode()<200 || response.statusCode()>299) throw new IllegalStateException("Serviço de e-mail recusou o envio");
     }
 }
