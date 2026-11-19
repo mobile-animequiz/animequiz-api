@@ -42,3 +42,9 @@ build/
 *.log
 .DS_Store
 Thumbs.db
+# Local persistent data and private settings
+data/
+.env
+.env.local
+.env.*
+!.env.example
