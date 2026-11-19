@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
+    java.util.Optional<Quiz> findByTitleIgnoreCase(String title);
 
     boolean existsByTitleIgnoreCase(String title);
 

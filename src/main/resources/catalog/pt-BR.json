@@ -1,0 +1,952 @@
+[
+  {
+    "title": "Naruto Shippuden Quiz",
+    "description": "Missão ninja: personagens e fundamentos. Perguntas em português.",
+    "difficulty": "FACIL",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_Naruto_characters"
+    ],
+    "questions": [
+      [
+        "Qual é o sonho de Naruto?",
+        "Ser Hokage",
+        "Ser um marinheiro",
+        "Ser alquimista federal",
+        "Ser um caçador de demônios"
+      ],
+      [
+        "Qual é a Raposa de Nove Caudas selada em Naruto?",
+        "Kurama",
+        "Shukaku",
+        "Matatabi",
+        "Son Goku"
+      ],
+      [
+        "Qual é a vila de origem de Naruto?",
+        "Vila da Folha (Konoha)",
+        "Vila da Areia (Suna)",
+        "Vila da Névoa (Kiri)",
+        "Vila da Nuvem (Kumo)"
+      ],
+      [
+        "Quem é o primeiro líder jōnin do Time 7 de Naruto?",
+        "Kakashi Hatake",
+        "Asuma Sarutobi",
+        "Might Guy",
+        "Iruka Umino"
+      ],
+      [
+        "Qual colega do Time 7 pertence ao clã Uchiha?",
+        "Sasuke",
+        "Shikamaru",
+        "Kiba",
+        "Choji"
+      ],
+      [
+        "Qual é o sobrenome de Sakura, integrante do Time 7?",
+        "Haruno",
+        "Hyuga",
+        "Yamanaka",
+        "Nara"
+      ],
+      [
+        "Qual mentor ensina Naruto a usar o Rasengan?",
+        "Jiraiya",
+        "Orochimaru",
+        "Kabuto",
+        "Zabuza"
+      ],
+      [
+        "Qual clã é conhecido pelo Byakugan?",
+        "Hyuga",
+        "Uchiha",
+        "Nara",
+        "Akimichi"
+      ],
+      [
+        "Qual personagem é o parceiro canino de Kiba?",
+        "Akamaru",
+        "Pakkun",
+        "Gamabunta",
+        "Katsuyu"
+      ],
+      [
+        "Quem costuma usar técnicas de manipulação de sombras?",
+        "Shikamaru Nara",
+        "Rock Lee",
+        "Choji Akimichi",
+        "Kiba Inuzuka"
+      ],
+      [
+        "Qual especialidade marca o estilo de combate de Rock Lee?",
+        "Taijutsu",
+        "Genjutsu ocular",
+        "Técnicas de insetos",
+        "Controle de marionetes"
+      ],
+      [
+        "Quem é o irmão mais velho de Sasuke?",
+        "Itachi Uchiha",
+        "Neji Hyuga",
+        "Gaara",
+        "Sai"
+      ],
+      [
+        "Qual personagem é uma ninja médica e uma dos três Sannin?",
+        "Tsunade",
+        "Temari",
+        "Tenten",
+        "Kurenai"
+      ],
+      [
+        "Quem ensina Naruto na academia e reconhece seu esforço desde o começo?",
+        "Iruka Umino",
+        "Danzō Shimura",
+        "Kisame Hoshigaki",
+        "Deidara"
+      ],
+      [
+        "Qual organização usa mantos pretos com nuvens vermelhas?",
+        "Akatsuki",
+        "ANBU",
+        "Time 7",
+        "Os Sete Espadachins"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "One Piece Quiz",
+    "description": "Rota dos Chapéus de Palha: tripulação e sonhos. Perguntas em português.",
+    "difficulty": "MEDIO",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_One_Piece_characters",
+      "https://en.wikipedia.org/wiki/Straw_Hat_Pirates"
+    ],
+    "questions": [
+      [
+        "Qual é o golpe do Luffy?",
+        "Gomu Gomu no Pistol",
+        "Kamehameha",
+        "Rasengan",
+        "Getsuga Tenshō"
+      ],
+      [
+        "Quem é o espadachim dos Chapéus de Palha?",
+        "Roronoa Zoro",
+        "Usopp",
+        "Sanji",
+        "Tony Tony Chopper"
+      ],
+      [
+        "Qual é o sonho de Luffy?",
+        "Ser o Rei dos Piratas",
+        "Ser o melhor espadachim do mundo",
+        "Ser almirante da Marinha",
+        "Encontrar o All Blue"
+      ],
+      [
+        "Quem é a navegadora dos Chapéus de Palha?",
+        "Nami",
+        "Nico Robin",
+        "Boa Hancock",
+        "Perona"
+      ],
+      [
+        "Qual integrante da tripulação atua como cozinheiro?",
+        "Sanji",
+        "Franky",
+        "Brook",
+        "Usopp"
+      ],
+      [
+        "Qual integrante dos Chapéus de Palha é médico e uma rena?",
+        "Tony Tony Chopper",
+        "Bepo",
+        "Carrot",
+        "Laboon"
+      ],
+      [
+        "Quem é a arqueóloga dos Chapéus de Palha?",
+        "Nico Robin",
+        "Nami",
+        "Shirahoshi",
+        "Vivi"
+      ],
+      [
+        "Qual integrante é o atirador da tripulação?",
+        "Usopp",
+        "Zoro",
+        "Jinbe",
+        "Brook"
+      ],
+      [
+        "Quem é o músico e esqueleto dos Chapéus de Palha?",
+        "Brook",
+        "Franky",
+        "Smoker",
+        "Koby"
+      ],
+      [
+        "Quem constrói o Thousand Sunny e é carpinteiro do bando?",
+        "Franky",
+        "Sanji",
+        "Usopp",
+        "Crocodile"
+      ],
+      [
+        "Quem entrega o chapéu de palha a Luffy quando ele é criança?",
+        "Shanks",
+        "Mihawk",
+        "Buggy",
+        "Garp"
+      ],
+      [
+        "Quem foi o Rei dos Piratas antes da jornada de Luffy?",
+        "Gol D. Roger",
+        "Edward Newgate",
+        "Silvers Rayleigh",
+        "Monkey D. Dragon"
+      ],
+      [
+        "Qual era o primeiro navio principal dos Chapéus de Palha?",
+        "Going Merry",
+        "Thousand Sunny",
+        "Oro Jackson",
+        "Moby Dick"
+      ],
+      [
+        "Qual é o grande sonho de Sanji?",
+        "Encontrar o All Blue",
+        "Desenhar um mapa mundial",
+        "Ser o maior espadachim",
+        "Conhecer a história do Século Perdido"
+      ],
+      [
+        "Qual integrante dos Chapéus de Palha é um homem-peixe e timoneiro?",
+        "Jinbe",
+        "Arlong",
+        "Hody Jones",
+        "Fisher Tiger"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "Dragon Ball — Escola de Guerreiros",
+    "description": "Treino básico de Dragon Ball e Dragon Ball Z. Perguntas em português.",
+    "difficulty": "FACIL",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_Dragon_Ball_characters",
+      "https://en.wikipedia.org/wiki/Dragon_Ball"
+    ],
+    "questions": [
+      [
+        "Qual é o nome saiyajin de Goku?",
+        "Kakarotto",
+        "Vegeta",
+        "Raditz",
+        "Bardock"
+      ],
+      [
+        "Qual mestre ensina o Kamehameha e treina Goku e Kuririn?",
+        "Mestre Kame",
+        "Mestre Karin",
+        "Senhor Kaioh",
+        "Kami-Sama"
+      ],
+      [
+        "Quem é a cientista ligada à Corporação Cápsula?",
+        "Bulma",
+        "Chi-Chi",
+        "Videl",
+        "Lunch"
+      ],
+      [
+        "Qual rival de Goku é conhecido como príncipe dos saiyajins?",
+        "Vegeta",
+        "Piccolo",
+        "Tenshinhan",
+        "Kuririn"
+      ],
+      [
+        "De qual povo é Piccolo?",
+        "Namekuseijins",
+        "Saiyajins",
+        "Tsufurujins",
+        "Terráqueos"
+      ],
+      [
+        "Quantas esferas terrestres são reunidas para invocar Shenlong?",
+        "Sete",
+        "Quatro",
+        "Nove",
+        "Doze"
+      ],
+      [
+        "Qual dragão é invocado pelas esferas terrestres originais?",
+        "Shenlong",
+        "Porunga",
+        "Super Shenlong",
+        "Alduin"
+      ],
+      [
+        "Qual é o nome do primeiro filho de Goku?",
+        "Gohan",
+        "Goten",
+        "Trunks",
+        "Pan"
+      ],
+      [
+        "Qual amigo de Goku treina com ele na escola do Mestre Kame?",
+        "Kuririn",
+        "Freeza",
+        "Nappa",
+        "Cell"
+      ],
+      [
+        "Quem é a mãe de Gohan e Goten?",
+        "Chi-Chi",
+        "Bulma",
+        "Videl",
+        "Androide 18"
+      ],
+      [
+        "Qual é o nome do filho de Vegeta e Bulma?",
+        "Trunks",
+        "Goten",
+        "Gohan",
+        "Uub"
+      ],
+      [
+        "Qual guerreiro verde treina Gohan antes da chegada dos saiyajins?",
+        "Piccolo",
+        "Yamcha",
+        "Mestre Kame",
+        "Chaos"
+      ],
+      [
+        "Qual instrumento ajuda Bulma a localizar as Esferas do Dragão?",
+        "Radar do Dragão",
+        "Scouter",
+        "Máquina do tempo",
+        "Cajado Mágico"
+      ],
+      [
+        "Qual técnica de Goku reúne energia de seres ao seu redor?",
+        "Genki Dama",
+        "Taiyoken",
+        "Makankosappo",
+        "Kienzan"
+      ],
+      [
+        "Qual vilão é o tirano que confronta Goku no planeta Namekusei?",
+        "Freeza",
+        "Pilaf",
+        "Majin Buu",
+        "Tao Pai Pai"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "Demon Slayer — Primeira Missão",
+    "description": "Personagens e técnicas do início da jornada. Perguntas em português.",
+    "difficulty": "MEDIO",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_Demon_Slayer:_Kimetsu_no_Yaiba_characters"
+    ],
+    "questions": [
+      [
+        "Qual é o sobrenome de Tanjiro?",
+        "Kamado",
+        "Agatsuma",
+        "Hashibira",
+        "Tomioka"
+      ],
+      [
+        "Qual é o nome da irmã de Tanjiro?",
+        "Nezuko",
+        "Kanao",
+        "Shinobu",
+        "Mitsuri"
+      ],
+      [
+        "Quem treina Tanjiro na Respiração da Água no início da história?",
+        "Sakonji Urokodaki",
+        "Kyojuro Rengoku",
+        "Tengen Uzui",
+        "Gyomei Himejima"
+      ],
+      [
+        "Qual Hashira encontra Tanjiro e Nezuko no início da história?",
+        "Giyu Tomioka",
+        "Obanai Iguro",
+        "Muichiro Tokito",
+        "Sanemi Shinazugawa"
+      ],
+      [
+        "Qual personagem usa uma máscara de javali?",
+        "Inosuke Hashibira",
+        "Zenitsu Agatsuma",
+        "Genya Shinazugawa",
+        "Murata"
+      ],
+      [
+        "Qual respiração é a especialidade inicial de Zenitsu?",
+        "Respiração do Trovão",
+        "Respiração da Água",
+        "Respiração das Chamas",
+        "Respiração da Serpente"
+      ],
+      [
+        "Qual personagem é conhecido como Hashira das Chamas?",
+        "Kyojuro Rengoku",
+        "Tengen Uzui",
+        "Giyu Tomioka",
+        "Muichiro Tokito"
+      ],
+      [
+        "Qual personagem é a Hashira do Inseto?",
+        "Shinobu Kocho",
+        "Mitsuri Kanroji",
+        "Kanao Tsuyuri",
+        "Aoi Kanzaki"
+      ],
+      [
+        "Quem lidera o Corpo de Caçadores no começo da jornada de Tanjiro?",
+        "Kagaya Ubuyashiki",
+        "Muzan Kibutsuji",
+        "Sakonji Urokodaki",
+        "Hotaru Haganezuka"
+      ],
+      [
+        "Quem é o principal líder dos demônios?",
+        "Muzan Kibutsuji",
+        "Akaza",
+        "Rui",
+        "Enmu"
+      ],
+      [
+        "Qual é a respiração usada por Inosuke?",
+        "Respiração da Besta",
+        "Respiração da Névoa",
+        "Respiração da Pedra",
+        "Respiração da Flor"
+      ],
+      [
+        "Qual Hashira é associado à Respiração do Som?",
+        "Tengen Uzui",
+        "Gyomei Himejima",
+        "Obanai Iguro",
+        "Sanemi Shinazugawa"
+      ],
+      [
+        "Qual jovem espadachim é o Hashira da Névoa?",
+        "Muichiro Tokito",
+        "Genya Shinazugawa",
+        "Sabito",
+        "Zenitsu Agatsuma"
+      ],
+      [
+        "Qual objeto Nezuko usa na boca durante boa parte da jornada inicial?",
+        "Um pedaço de bambu",
+        "Uma máscara de raposa",
+        "Uma faixa metálica",
+        "Um colar de contas"
+      ],
+      [
+        "Que tipo de espada é associado aos caçadores de demônios?",
+        "Espada Nichirin",
+        "Zanpakutō",
+        "Shusui",
+        "Samehada"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "My Hero Academia — Classe de Heróis",
+    "description": "Heróis e individualidades da U.A. Perguntas em português.",
+    "difficulty": "FACIL",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_My_Hero_Academia_characters"
+    ],
+    "questions": [
+      [
+        "Qual é o nome civil do herói Deku?",
+        "Izuku Midoriya",
+        "Katsuki Bakugo",
+        "Shoto Todoroki",
+        "Tenya Iida"
+      ],
+      [
+        "Qual poder All Might transmite a Izuku?",
+        "One For All",
+        "All For One",
+        "Explosion",
+        "Erasure"
+      ],
+      [
+        "Qual é a individualidade de Katsuki Bakugo?",
+        "Explosão",
+        "Gravidade Zero",
+        "Motor",
+        "Endurecimento"
+      ],
+      [
+        "Qual é a individualidade de Ochaco Uraraka?",
+        "Gravidade Zero",
+        "Criação",
+        "Invisibilidade",
+        "Eletrificação"
+      ],
+      [
+        "Qual aluno combina poderes de gelo e fogo?",
+        "Shoto Todoroki",
+        "Eijiro Kirishima",
+        "Denki Kaminari",
+        "Fumikage Tokoyami"
+      ],
+      [
+        "Qual professor da Classe 1-A usa o nome de herói Eraser Head?",
+        "Shota Aizawa",
+        "Present Mic",
+        "All Might",
+        "Cementoss"
+      ],
+      [
+        "Quem é o herói conhecido como Símbolo da Paz?",
+        "All Might",
+        "Endeavor",
+        "Hawks",
+        "Best Jeanist"
+      ],
+      [
+        "Qual aluna possui características e habilidades de sapo?",
+        "Tsuyu Asui",
+        "Momo Yaoyorozu",
+        "Mina Ashido",
+        "Kyoka Jiro"
+      ],
+      [
+        "Qual individualidade move os motores nas pernas de Tenya Iida?",
+        "Motor",
+        "Jet",
+        "Overhaul",
+        "Blackwhip"
+      ],
+      [
+        "Qual aluno é conhecido pela individualidade Endurecimento?",
+        "Eijiro Kirishima",
+        "Yuga Aoyama",
+        "Minoru Mineta",
+        "Koji Koda"
+      ],
+      [
+        "Quem é o pai de Shoto Todoroki?",
+        "Endeavor",
+        "All Might",
+        "Gran Torino",
+        "Eraser Head"
+      ],
+      [
+        "Qual aluna cria objetos a partir dos lipídios do próprio corpo?",
+        "Momo Yaoyorozu",
+        "Toru Hagakure",
+        "Ochaco Uraraka",
+        "Tsuyu Asui"
+      ],
+      [
+        "Qual aluno possui a individualidade Dark Shadow?",
+        "Fumikage Tokoyami",
+        "Mezo Shoji",
+        "Hanta Sero",
+        "Rikido Sato"
+      ],
+      [
+        "Qual aluna usa a individualidade Earphone Jack?",
+        "Kyoka Jiro",
+        "Mina Ashido",
+        "Toru Hagakure",
+        "Itsuka Kendo"
+      ],
+      [
+        "Qual é a escola de heróis frequentada por Izuku e a Classe 1-A?",
+        "U.A.",
+        "Shiketsu",
+        "Ketsubutsu",
+        "Isamu"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "Fullmetal Alchemist — Troca Equivalente",
+    "description": "Os irmãos Elric e o mundo de Brotherhood. Perguntas em português.",
+    "difficulty": "MEDIO",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_Fullmetal_Alchemist_characters",
+      "https://en.wikipedia.org/wiki/Fullmetal_Alchemist"
+    ],
+    "questions": [
+      [
+        "Qual é o sobrenome dos irmãos Edward e Alphonse?",
+        "Elric",
+        "Rockbell",
+        "Mustang",
+        "Armstrong"
+      ],
+      [
+        "Qual dos irmãos recebe o título Alquimista de Aço?",
+        "Edward",
+        "Alphonse",
+        "Ambos",
+        "Nenhum"
+      ],
+      [
+        "Em que o espírito de Alphonse fica preso durante a jornada?",
+        "Uma armadura",
+        "Uma pedra preciosa",
+        "Um livro",
+        "Uma espada"
+      ],
+      [
+        "Que tentativa proibida causa a perda de partes dos corpos dos irmãos?",
+        "Transmutação humana",
+        "Criação de ouro",
+        "Construção de um automail",
+        "Evocação de um dragão"
+      ],
+      [
+        "Qual é o nome da mãe dos irmãos Elric?",
+        "Trisha",
+        "Izumi",
+        "Riza",
+        "Pinako"
+      ],
+      [
+        "Quem é a amiga e mecânica de automail dos irmãos?",
+        "Winry Rockbell",
+        "Riza Hawkeye",
+        "Olivier Armstrong",
+        "Maria Ross"
+      ],
+      [
+        "Qual princípio é central à alquimia da série?",
+        "Troca equivalente",
+        "Energia infinita",
+        "Desejos sem custo",
+        "Poder por amizade apenas"
+      ],
+      [
+        "Que artefato os irmãos procuram para recuperar seus corpos?",
+        "Pedra Filosofal",
+        "Esfera do Dragão",
+        "Death Note",
+        "Joia de Quatro Almas"
+      ],
+      [
+        "Qual militar é conhecido como Alquimista das Chamas?",
+        "Roy Mustang",
+        "Alex Louis Armstrong",
+        "Maes Hughes",
+        "Jean Havoc"
+      ],
+      [
+        "Qual atiradora é uma importante aliada de Roy Mustang?",
+        "Riza Hawkeye",
+        "Winry Rockbell",
+        "Izumi Curtis",
+        "Sheska"
+      ],
+      [
+        "Qual instrutora ensina alquimia aos irmãos Elric?",
+        "Izumi Curtis",
+        "Pinako Rockbell",
+        "Olivier Armstrong",
+        "Trisha Elric"
+      ],
+      [
+        "Como se chama o país onde se passa grande parte da história?",
+        "Amestris",
+        "Xing",
+        "Ishval",
+        "Drachma"
+      ],
+      [
+        "Qual família é conhecida por seu estilo de alquimia e musculatura imponente?",
+        "Armstrong",
+        "Elric",
+        "Rockbell",
+        "Bradley"
+      ],
+      [
+        "Qual prótese mecânica Edward usa?",
+        "Automail",
+        "Scouter",
+        "Equipamento de manobra",
+        "Armadura de cavaleiro"
+      ],
+      [
+        "Qual personagem de Xing busca um meio de alcançar a imortalidade para seu clã?",
+        "Ling Yao",
+        "Scar",
+        "Tim Marcoh",
+        "Solf J. Kimblee"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "Attack on Titan — Além das Muralhas",
+    "description": "Personagens e organizações dos primeiros arcos. Perguntas em português.",
+    "difficulty": "MEDIO",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_Attack_on_Titan_characters",
+      "https://en.wikipedia.org/wiki/Attack_on_Titan"
+    ],
+    "questions": [
+      [
+        "Qual é o nome do protagonista criado no distrito de Shiganshina?",
+        "Eren Yeager",
+        "Levi Ackerman",
+        "Erwin Smith",
+        "Jean Kirstein"
+      ],
+      [
+        "Qual amiga de infância de Eren pertence à família Ackerman?",
+        "Mikasa",
+        "Sasha",
+        "Annie",
+        "Historia"
+      ],
+      [
+        "Qual amigo de Eren sonha em conhecer o oceano?",
+        "Armin Arlert",
+        "Connie Springer",
+        "Reiner Braun",
+        "Bertholdt Hoover"
+      ],
+      [
+        "Qual muralha é rompida no ataque inicial que muda a vida de Eren?",
+        "Muralha Maria",
+        "Muralha Rose",
+        "Muralha Sina",
+        "Muralha de Briggs"
+      ],
+      [
+        "Qual tropa se dedica à exploração além das muralhas?",
+        "Tropa de Exploração",
+        "Polícia Militar",
+        "Guarnição",
+        "Polícia Secreta Central"
+      ],
+      [
+        "Qual símbolo é associado à Tropa de Exploração?",
+        "Asas da Liberdade",
+        "Uma folha",
+        "Uma caveira com chapéu",
+        "Um círculo de transmutação"
+      ],
+      [
+        "Qual capitão da Tropa de Exploração é conhecido por sua habilidade excepcional?",
+        "Levi Ackerman",
+        "Hannes",
+        "Dot Pixis",
+        "Keith Shadis"
+      ],
+      [
+        "Quem comanda a Tropa de Exploração durante os primeiros grandes arcos?",
+        "Erwin Smith",
+        "Grisha Yeager",
+        "Kenny Ackerman",
+        "Rod Reiss"
+      ],
+      [
+        "Qual região do corpo é a principal vulnerabilidade de um titã comum?",
+        "Nuca",
+        "Pés",
+        "Mãos",
+        "Barriga"
+      ],
+      [
+        "Que equipamento permite aos soldados se deslocarem com cabos e gás?",
+        "Equipamento de manobra tridimensional",
+        "Automail",
+        "Radar do Dragão",
+        "Armadura de chakra"
+      ],
+      [
+        "Qual distrito é a terra natal de Eren, Mikasa e Armin?",
+        "Shiganshina",
+        "Trost",
+        "Stohess",
+        "Utopia"
+      ],
+      [
+        "Qual soldado é conhecido pelo apelido associado a uma batata durante o treinamento?",
+        "Sasha Blouse",
+        "Annie Leonhart",
+        "Historia Reiss",
+        "Ymir"
+      ],
+      [
+        "Qual tropa é encarregada de manter a ordem no interior e proteger o rei?",
+        "Polícia Militar",
+        "Tropa de Exploração",
+        "Corpo de Treinamento",
+        "Guarnição do porto"
+      ],
+      [
+        "Qual é o nome do pai de Eren?",
+        "Grisha Yeager",
+        "Hannes",
+        "Erwin Smith",
+        "Zeke Yeager"
+      ],
+      [
+        "Qual é a muralha mais interna entre Maria, Rose e Sina?",
+        "Sina",
+        "Maria",
+        "Rose",
+        "Todas ficam na mesma posição"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  },
+  {
+    "title": "Death Note — Jogo de Investigação",
+    "description": "Regras do caderno e personagens centrais. Perguntas em português.",
+    "difficulty": "MEDIO",
+    "category": "SHONEN",
+    "sources": [
+      "https://en.wikipedia.org/wiki/List_of_Death_Note_characters",
+      "https://en.wikipedia.org/wiki/Death_Note"
+    ],
+    "questions": [
+      [
+        "Quem encontra o caderno no começo de Death Note?",
+        "Light Yagami",
+        "L",
+        "Near",
+        "Soichiro Yagami"
+      ],
+      [
+        "Qual shinigami deixa cair o caderno encontrado por Light?",
+        "Ryuk",
+        "Rem",
+        "Gelus",
+        "Sidoh"
+      ],
+      [
+        "Além de escrever o nome, o que o usuário precisa conhecer para atingir uma pessoa?",
+        "O rosto da pessoa",
+        "O endereço da pessoa",
+        "A impressão digital",
+        "A data de nascimento"
+      ],
+      [
+        "Qual pseudônimo é usado pelo detetive que enfrenta Kira no início?",
+        "L",
+        "Zero",
+        "Deku",
+        "N"
+      ],
+      [
+        "Qual fruta é associada ao gosto de Ryuk?",
+        "Maçã",
+        "Banana",
+        "Laranja",
+        "Uva"
+      ],
+      [
+        "Qual é o nome da modelo e atriz conhecida como segunda Kira?",
+        "Misa Amane",
+        "Naomi Misora",
+        "Kiyomi Takada",
+        "Sayu Yagami"
+      ],
+      [
+        "Qual shinigami está ligado a Misa durante a história?",
+        "Rem",
+        "Ryuk",
+        "Sidoh",
+        "Gelus"
+      ],
+      [
+        "Qual é o nome do pai de Light, integrante da investigação?",
+        "Soichiro Yagami",
+        "Shuichi Aizawa",
+        "Touta Matsuda",
+        "Watari"
+      ],
+      [
+        "Qual é o sobrenome de Light e de sua irmã Sayu?",
+        "Yagami",
+        "Amane",
+        "Lawliet",
+        "Misora"
+      ],
+      [
+        "Qual auxiliar de L atua como seu contato e cuidador?",
+        "Watari",
+        "Aiber",
+        "Mogi",
+        "Demegawa"
+      ],
+      [
+        "Qual é o tipo de ser sobrenatural que Ryuk representa?",
+        "Shinigami",
+        "Titã",
+        "Saiyajin",
+        "Homúnculo"
+      ],
+      [
+        "Qual estudante é um dos sucessores de L e usa o nome Near?",
+        "Nate River",
+        "Mihael Keehl",
+        "Teru Mikami",
+        "Stephen Gevanni"
+      ],
+      [
+        "Qual sucessor de L usa o nome Mello?",
+        "Mihael Keehl",
+        "Nate River",
+        "Light Yagami",
+        "Raye Penber"
+      ],
+      [
+        "Qual promotor passa a atuar como executor ligado a Kira?",
+        "Teru Mikami",
+        "Touta Matsuda",
+        "Shuichi Aizawa",
+        "Hirokazu Ukita"
+      ],
+      [
+        "Qual ex-agente do FBI investiga a morte de Raye Penber?",
+        "Naomi Misora",
+        "Kiyomi Takada",
+        "Misa Amane",
+        "Sachiko Yagami"
+      ]
+    ],
+    "language": "pt-BR",
+    "reviewedAt": "2026-11-19"
+  }
+]
+
