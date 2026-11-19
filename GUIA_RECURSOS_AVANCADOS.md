@@ -1,3 +1,5 @@
+Guia complementar atual: [CONFIGURACAO_ENTREGA.md](docs/CONFIGURACAO_ENTREGA.md), com os limites específicos de autenticação e os contratos de perfil/Google/reset.
+
 # Anime Quiz API — Parte 2: recursos avançados
 
 > Implementação de estudo para execução **em uma única instância** com banco H2 em memória. Esta versão não substitui validação em ambiente real. As rotas do mobile com JWT foram mantidas.
@@ -48,7 +50,7 @@
 - Repita **a mesma requisição**, com mesmo usuário, mesmo header e JSON: `200`, `Idempotency-Replayed: true`, **mesmo `scoreId`**.
 - Repita a chave com respostas diferentes: `409 Conflict`.
 - Sem header: permanece o comportamento antigo, com nova tentativa e retorno `201` (compatibilidade com mobile).
-- Registro de idempotência é persistido no H2 em memória e sobrevive a requisições repetidas, mas não ao reinício da base.
+- Registro de idempotência é persistido no banco H2 configurado; com arquivo em volume durável, sobrevive ao reinício.
 - A implementação usa sincronização por processo e transação completa: para múltiplas instâncias seria necessário armazenamento distribuído/locking distribuído.
 
 ## Dúvidas do professor — respostas curtas
@@ -59,7 +61,7 @@
 - **O que é CORS?** Política aplicada pelo navegador que autoriza origens, métodos e headers; não substitui autenticação.
 - **Como versiona?** `X-API-Version` na mesma URL; versão 1 e 2 têm contratos diferentes.
 - **Quem calcula a pontuação?** `AttemptService`/`ScoreCalculator` no servidor. O cliente só envia a alternativa escolhida.
-- **Por que H2?** Simplifica a avaliação. É banco em memória: dados podem desaparecer após reiniciar.
+- **Por que H2?** Simplifica a avaliação. O padrão atual é arquivo: a hospedagem precisa de volume durável para sobreviver a reinícios/deploys.
 
 ## Atenção antes de publicar
 
