@@ -35,6 +35,12 @@ public class User {
     @Column(name = "user_role", nullable = false, length = 20)
     private String role = "USER";
 
+    @Column(unique = true, length = 255)
+    private String googleSubject;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int credentialVersion;
+
     @ManyToMany
     @JoinTable(name = "tb_user_favorite_quizzes",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -54,6 +60,10 @@ public class User {
     public LocalDate getDateOfBirth() { return dateOfBirth; }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
     public String getRole() { return role; }
+    public String getGoogleSubject() { return googleSubject; }
+    public void setGoogleSubject(String subject) { googleSubject = subject; }
+    public int getCredentialVersion() { return credentialVersion; }
+    public void revokeSessions() { credentialVersion++; }
     public void setRole(String role) { this.role = role; }
     public Set<Quiz> getFavoriteQuizzes() { return favoriteQuizzes; }
     public void setFavoriteQuizzes(Set<Quiz> favoriteQuizzes) { this.favoriteQuizzes = favoriteQuizzes; }

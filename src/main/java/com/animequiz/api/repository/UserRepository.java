@@ -8,6 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.id = :id")
+    java.util.Optional<User> findForUpdate(@Param("id") Long id);
+
+    java.util.Optional<User> findByGoogleSubject(String subject);
+
+    @Query("select q from User u join u.favoriteQuizzes q where u.id = :userId")
+    Page<com.animequiz.api.entity.Quiz> findFavorites(@Param("userId") Long userId, Pageable pageable);
     boolean existsByUsernameIgnoreCase(String username);
     boolean existsByEmailIgnoreCase(String email);
     java.util.Optional<User> findByEmailIgnoreCase(String email);

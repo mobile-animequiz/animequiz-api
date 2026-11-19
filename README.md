@@ -1,5 +1,7 @@
 # Anime Quiz API
 
+Guia atual: [perfil, favoritos, Google, recuperação, banco persistente e limites](docs/CONFIGURACAO_ENTREGA.md). São 8 quizzes/120 perguntas no seed novo; Google/Resend e deploy exigem configuração externa. Swagger padrão em /swagger-ui.html.
+
 > Atualização para a apresentação: consulte [VERSOES_E_FUNCIONALIDADES.md](VERSOES_E_FUNCIONALIDADES.md) para alternar V1/V2 no Swagger e no mobile, usar imagens nas questões e demonstrar cada funcionalidade. No Windows, `./Run-Api.ps1` inicia a API e `./Run-Api.ps1 -Test` executa a suíte.
 
 API REST do **Anime Quiz**, desenvolvida em Java e Spring Boot para atender o aplicativo de quizzes de anime. A API gerencia contas, perfis, quizzes, questões, alternativas e pontuações; a correção das respostas e o cálculo dos pontos acontecem no servidor.
@@ -12,7 +14,7 @@ API REST do **Anime Quiz**, desenvolvida em Java e Spring Boot para atender o ap
 | Spring Boot 3.3.2 | Aplicação REST |
 | Spring Web | Controllers e endpoints HTTP |
 | Spring Data JPA / Hibernate | Persistência e consultas |
-| H2 | Banco de dados em memória para desenvolvimento |
+| H2 | Banco em arquivo; volume persistente em produção |
 | Spring Security | Autenticação e autorização |
 | JWT / JOSE (HS256) | Tokens Bearer |
 | BCrypt | Hash de senhas |
@@ -239,7 +241,7 @@ Contas criadas pelo cadastro público recebem a role `USER`. Não existe endpoin
 
 O console está desabilitado por padrão. Para habilitá-lo durante desenvolvimento local, configure `H2_CONSOLE_ENABLED=true` antes de iniciar a aplicação. O console permite consultar diretamente as tabelas, inclusive a coluna que armazena o gabarito; não o habilite em ambientes publicados.
 
-O banco H2 é mantido em memória. Os dados são recriados a cada reinicialização. A migração para um banco persistente pertence a uma etapa separada.
+O padrão é H2 em arquivo em ./data. Em produção, configure DB_URL em volume persistente. Faça backup/exportação antes de trocar a base; dados da antiga base em memória não são migrados automaticamente.
 
 ## Estrutura do código
 
@@ -264,12 +266,11 @@ src/test/java
 
 ## Limitações atuais
 
-- H2 está em memória; os dados não sobrevivem a reinicializações.
-- Não há migrações de banco com Flyway.
-- Não há verificação de posse do e-mail, recuperação de senha, refresh token ou login social.
-- Não há rate limiting, idempotência por chave, API Key ou versionamento por header.
-- CORS não foi configurado nesta etapa. Aplicativos Android nativos não dependem de CORS do navegador; clientes web precisam de origens permitidas explícitas.
-- A integração do aplicativo mobile e o deploy não fazem parte deste repositório/etapa.
+- H2 em arquivo requer volume durável e uma instância; não há migrações Flyway nem suporte a réplicas com arquivo compartilhado.
+- Login Google e e-mail Resend exigem configuração externa e validação real.
+- Não há refresh token. O JWT expira e é revogado após redefinir a senha.
+- Rate limiting usa contadores por processo/IP remoto; múltiplas instâncias precisam de gateway/armazenamento compartilhado.
+- Deploy e migração/exportação da base existente permanecem pendentes.
 
 ## Histórico
 
@@ -281,4 +282,4 @@ Os exemplos demonstráveis de `X-API-Version`, `X-API-Key`, `X-Idempotency-Key`,
 
 Importe a coleção [POSTMAN_PARTE2_ANIME_QUIZ.json](POSTMAN_PARTE2_ANIME_QUIZ.json) no Postman e preencha as variáveis `baseUrl`, `token` e `apiKey` conforme o cenário.
 
-**Compatibilidade:** o JWT e os endpoints usados pelo aplicativo mobile permanecem ativos; `X-Idempotency-Key` é opcional, não exigido pelos clientes antigos. As novas garantias de idempotência e rate limiting são adequadas a uma instância com H2 em memória e não substituem um mecanismo distribuído.
+**Compatibilidade:** o JWT e os endpoints usados pelo aplicativo mobile permanecem ativos; `X-Idempotency-Key` é opcional, não exigido pelos clientes antigos. As novas garantias de idempotência e rate limiting são destinadas a uma instância com H2 em arquivo e não substituem um mecanismo distribuído.
