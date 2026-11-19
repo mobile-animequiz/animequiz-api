@@ -63,6 +63,24 @@ class OpenApiContractTest {
     }
 
     @Test
+    void accountOperationsDocumentActualStatusesOwnershipAndRateLimitHeaders() throws Exception {
+        mockMvc.perform(get("/api-docs/v1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['200']").exists())
+                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['201']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['202']").exists())
+                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['201']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/auth/reset-password'].post.responses['204']").exists())
+                .andExpect(jsonPath("$.paths['/auth/google/link'].post.security[0].bearerAuth").exists())
+                .andExpect(jsonPath("$.paths['/users/me/settings'].patch.security[0].bearerAuth").exists())
+                .andExpect(jsonPath("$.paths['/users/me/settings'].patch.responses['403']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/users/me/avatar'].delete.responses['200']").exists())
+                .andExpect(jsonPath("$.paths['/users/me/avatar'].delete.responses['204']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['429'].headers['Retry-After']").exists())
+                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['429'].headers['X-AuthRateLimit-Reset']").exists())
+                .andExpect(jsonPath("$.paths['/users/me/favorites'].get.parameters[0].name").value("page"));
+    }
+
+    @Test
     void authenticationAndProtectedOperationsDeclareBearerJwtSecurity() throws Exception {
         mockMvc.perform(get("/api-docs"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.type").value("http"))

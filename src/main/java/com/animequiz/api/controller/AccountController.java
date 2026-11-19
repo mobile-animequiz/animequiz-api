@@ -27,20 +27,23 @@ public class AccountController {
     public AccountController(AccountService accounts) { this.accounts=accounts; }
     private Long id(Jwt jwt) { return Long.valueOf(jwt.getSubject()); }
     @GetMapping("/settings")
+    @ApiResponse(responseCode="200",description="Preferências do titular",content=@io.swagger.v3.oas.annotations.media.Content(schema=@io.swagger.v3.oas.annotations.media.Schema(implementation=AccountSettingsResponse.class)))
     @Operation(summary="Ler preferências",description="Padrão: pt-BR, midnight e violet. Nome de exibição não muda o login. Dados persistidos no banco configurado.")
     public AccountSettingsResponse read(@AuthenticationPrincipal Jwt jwt) { return accounts.read(id(jwt)); }
     @PatchMapping("/settings")
+    @ApiResponse(responseCode="200",description="Preferências salvas",content=@io.swagger.v3.oas.annotations.media.Content(schema=@io.swagger.v3.oas.annotations.media.Schema(implementation=AccountSettingsResponse.class)))
     @Operation(summary="Alterar nome de exibição, tema, destaque e idioma",description="PATCH parcial. Campos omitidos são preservados; tema midnight/eclipse, destaque violet/cyan/rose, idioma pt-BR/en/device.")
     public AccountSettingsResponse update(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody AccountSettingsRequest request) {
         return accounts.update(id(jwt),request);
     }
     @PutMapping(value="/avatar",consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary="Enviar foto da galeria",description="Campo multipart file: JPEG/PNG, até 2 MiB, dimensões até 4096 e até 8 milhões de pixels. Conteúdo validado no servidor, independente do nome/MIME informado.")
-    @ApiResponses({@ApiResponse(responseCode="200",description="Foto salva e versão incrementada"),@ApiResponse(responseCode="413",description="Arquivo excede limite multipart")})
+    @ApiResponses({@ApiResponse(responseCode="200",description="Foto salva e versão incrementada",content=@io.swagger.v3.oas.annotations.media.Content(schema=@io.swagger.v3.oas.annotations.media.Schema(implementation=AccountSettingsResponse.class))),@ApiResponse(responseCode="413",description="Arquivo excede limite multipart")})
     public AccountSettingsResponse upload(@AuthenticationPrincipal Jwt jwt,@RequestPart("file") MultipartFile file) {
         return accounts.upload(id(jwt),file);
     }
     @GetMapping("/avatar")
+    @ApiResponse(responseCode="200",description="Imagem privada",content={@io.swagger.v3.oas.annotations.media.Content(mediaType="image/jpeg",schema=@io.swagger.v3.oas.annotations.media.Schema(type="string",format="binary")),@io.swagger.v3.oas.annotations.media.Content(mediaType="image/png",schema=@io.swagger.v3.oas.annotations.media.Schema(type="string",format="binary"))})
     @Operation(summary="Baixar a própria foto",description="Requer Bearer também no carregamento da imagem; Cache-Control private/no-store e ETag por versão. Não inclui token na URL.")
     @ApiResponse(responseCode="404",description="Ainda não há foto")
     public ResponseEntity<byte[]> avatar(@AuthenticationPrincipal Jwt jwt) {
@@ -50,18 +53,22 @@ public class AccountController {
             .eTag(Long.toString(avatar.version())).body(avatar.bytes());
     }
     @DeleteMapping("/avatar") @Operation(summary="Remover a própria foto")
+    @ApiResponse(responseCode="200",description="Preferências com hasAvatar=false",content=@io.swagger.v3.oas.annotations.media.Content(schema=@io.swagger.v3.oas.annotations.media.Schema(implementation=AccountSettingsResponse.class)))
     public AccountSettingsResponse deleteAvatar(@AuthenticationPrincipal Jwt jwt) { return accounts.deleteAvatar(id(jwt)); }
     @GetMapping("/favorites")
+    @ApiResponse(responseCode="200",description="Página de favoritos",content=@io.swagger.v3.oas.annotations.media.Content(schema=@io.swagger.v3.oas.annotations.media.Schema(implementation=FavoritePage.class)))
     @Operation(summary="Listar meus favoritos",description="Página zero-based, size 1–50; ordenação estável por ID. Lista apenas favoritos do titular do JWT.")
     public FavoritePage favorites(@AuthenticationPrincipal Jwt jwt,
         @RequestParam(defaultValue="0") @Min(0) int page,@RequestParam(defaultValue="20") @Min(1) @Max(50) int size) {
         return FavoritePage.of(accounts.favorites(id(jwt),page,size));
     }
     @PutMapping("/favorites/{quizId}") @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode="204",description="Favorito salvo")
     @Operation(summary="Favoritar quiz",description="Idempotente: repetir a mesma operação não duplica o favorito.")
     @ApiResponse(responseCode="404",description="Quiz inexistente")
     public void favorite(@AuthenticationPrincipal Jwt jwt,@PathVariable @Positive Long quizId) { accounts.favorite(id(jwt),quizId,true); }
     @DeleteMapping("/favorites/{quizId}") @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode="204",description="Favorito removido")
     @Operation(summary="Desfavoritar quiz",description="Idempotente para quiz existente; favoritos de outras contas não são alterados.")
     public void unfavorite(@AuthenticationPrincipal Jwt jwt,@PathVariable @Positive Long quizId) { accounts.favorite(id(jwt),quizId,false); }
 }

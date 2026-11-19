@@ -31,6 +31,7 @@ public class AccountAuthController {
         @ApiResponse(responseCode="503",description="Integração não configurada")})
     public AuthResponse google(@Valid @RequestBody GoogleRequest request) { return google.login(request.idToken()); }
     @PostMapping("/google/link") @ResponseStatus(HttpStatus.NO_CONTENT) @SecurityRequirement(name="bearerAuth")
+    @ApiResponses({@ApiResponse(responseCode="204",description="Google vinculado"),@ApiResponse(responseCode="401",description="Sessão ou identidade inválida"),@ApiResponse(responseCode="409",description="E-mail diferente ou vínculo já pertencente a outra conta"),@ApiResponse(responseCode="503",description="Google não configurado")})
     @Operation(summary="Vincular Google à conta autenticada",description="Requer JWT próprio válido e ID token Google verificado com o mesmo e-mail. Subject não pode pertencer a outra conta.")
     public void link(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody GoogleRequest request) { google.link(Long.valueOf(jwt.getSubject()),request.idToken()); }
     @PostMapping("/forgot-password")

@@ -72,8 +72,20 @@ import java.util.regex.Pattern;
                         **Permissões:** operações administrativas exigem `ROLE_ADMIN`. Leituras do catálogo
                         e do ranking são públicas; tentativas e dados pessoais exigem autenticação.
 
-                        **Persistência:** H2 em memória, com dados de demonstração carregados na inicialização.
-                        Configure `JWT_SECRET` no ambiente antes de iniciar a aplicação.
+                        **Persistência:** H2 em arquivo. Em produção, configure `DB_URL` em volume durável,
+                        backups e `JWT_SECRET`. O catálogo inicial é idempotente: 8 quizzes / 120 perguntas
+                        em português; não cria contas de demonstração em produção.
+
+                        **Limites implementados:** janela fixa por IP remoto da conexão, por instância.
+                        Global: 120 requisições/60 s (configurável). Autenticação, por rota:
+                        login e Google 20/60 s; cadastro 10/900 s; vinculação Google 10/600 s;
+                        recuperação 5/900 s; redefinição 10/900 s. Recuperação também limita a 3
+                        solicitações por e-mail/hora, mantendo 202 genérico. Excesso de IP retorna 429,
+                        `Retry-After` em segundos, `X-RateLimit-*` (global) e `X-AuthRateLimit-*`
+                        (autenticação): Limit, Remaining, Reset (Unix segundos). OPTIONS e documentação
+                        são isentos do limite global. Não confia no X-Forwarded-For do cliente.
+                        Atrás de proxy, o IP remoto pode agrupar clientes; múltiplas instâncias exigem
+                        armazenamento compartilhado/gateway para limites globais entre servidores.
 
                         **Pontuação:** `acertos x 10 x peso da dificuldade` (`FACIL` = 1, `MEDIO` = 2,
                         `DIFICIL` = 3). O gabarito não é incluído nas respostas da API.
@@ -252,8 +264,9 @@ public class OpenApiConfig {
             return;
         }
 
-        boolean create = method == PathItem.HttpMethod.POST && !path.equals("/auth/login");
-        boolean delete = method == PathItem.HttpMethod.DELETE;
+        boolean accountRoute = path.startsWith("/users/me/") || (path.startsWith("/auth/") && !path.equals("/auth/register") && !path.equals("/auth/login"));
+        boolean create = method == PathItem.HttpMethod.POST && !path.equals("/auth/login") && !accountRoute;
+        boolean delete = method == PathItem.HttpMethod.DELETE && !accountRoute;
         boolean hasBody = operation.getRequestBody() != null;
         String key = method.name() + " " + path;
 
@@ -310,24 +323,42 @@ public class OpenApiConfig {
 
         if (hasBody) {
             responses.putIfAbsent("415", error(415, "Unsupported Media Type",
-                    "Unsupported Media Type: o corpo deve ser enviado como application/json",
+                    path.equals("/users/me/avatar") ? "Envie multipart/form-data com campo file" : "Unsupported Media Type: o corpo deve ser enviado como application/json",
                     "Tipo de conteúdo não suportado"));
         }
         responses.putIfAbsent("429", error(429, "Too Many Requests", "Rate limit por IP excedido; consultar Retry-After", "Limite de requisicoes excedido"));
+        ApiResponse limited = responses.get("429");
+        limited.addHeaderObject("Retry-After", new Header().description("Segundos até a próxima janela").schema(new Schema<Integer>().type("integer").example(60)));
+        for (String prefix : path.startsWith("/auth/") ? new String[]{"X-RateLimit-", "X-AuthRateLimit-"} : new String[]{"X-RateLimit-"}) {
+            for (String suffix : new String[]{"Limit","Remaining","Reset"}) limited.addHeaderObject(prefix+suffix,
+                    new Header().description(suffix.equals("Reset") ? "Fim da janela em Unix segundos" : "Quantidade de requisições").schema(new Schema<Long>().type("integer").format("int64")));
+        }
         responses.putIfAbsent("500", internalError());
+        Map<String, String> examples = Map.of(
+                "400", validationExample(path), "401", "Autenticação necessária ou identidade inválida",
+                "403", "Você não possui permissão para executar esta operação", "404", "Recurso não encontrado",
+                "409", "Estado da conta ou vínculo incompatível com esta operação",
+                "413", "A foto excede o limite permitido", "415", "Tipo de conteúdo não suportado",
+                "429", "Muitas solicitações. Aguarde e tente novamente.",
+                "503", "Integração temporariamente indisponível");
+        responses.forEach((code, response) -> {
+            if (examples.containsKey(code) && (response.getContent() == null || response.getContent().isEmpty())) {
+                response.setContent(error(Integer.parseInt(code), org.springframework.http.HttpStatus.valueOf(Integer.parseInt(code)).getReasonPhrase(), response.getDescription(), examples.get(code)).getContent());
+            }
+        });
     }
 
     private static boolean requiresAdmin(String path, PathItem.HttpMethod method) {
         if (path.startsWith("/auth/") || path.equals(ATTEMPTS_PATH) || path.startsWith("/api-keys")) return false;
         if (path.startsWith("/profiles")) return true;
         if (path.startsWith("/users")) {
-            return !path.equals("/users/me") && !path.equals("/users/{userId}/profile");
+            return !path.equals("/users/me") && !path.startsWith("/users/me/") && !path.equals("/users/{userId}/profile");
         }
         return method == PathItem.HttpMethod.POST || method == PathItem.HttpMethod.PUT || method == PathItem.HttpMethod.DELETE;
     }
 
     private static boolean requiresAuthentication(String path, PathItem.HttpMethod method) {
-        if ((path.startsWith("/api-keys") && !path.equals("/api-keys/verify")) || path.equals("/users/me") || path.equals("/users/{userId}/profile")
+        if ((path.startsWith("/api-keys") && !path.equals("/api-keys/verify")) || path.equals("/users/me") || path.startsWith("/users/me/") || path.equals("/auth/google/link") || path.equals("/users/{userId}/profile")
                 || path.equals("/quizzes/{quizId}/attempts")
                 || (path.startsWith("/scores/") && !path.equals("/scores/ranking"))
                 || path.equals("/scores")) return true;
@@ -369,6 +400,12 @@ public class OpenApiConfig {
     }
 
     private static String validationExample(String path) {
+        if (path.equals("/users/me/settings")) return "Nome deve ter entre 2 e 50 caracteres, sem controles";
+        if (path.equals("/users/me/avatar")) return "Selecione uma imagem JPEG ou PNG";
+        if (path.startsWith("/users/me/favorites")) return "page deve ser >= 0; size deve estar entre 1 e 50; quizId deve ser positivo";
+        if (path.startsWith("/auth/google")) return "idToken: não deve estar em branco";
+        if (path.equals("/auth/forgot-password")) return "email: informe um e-mail válido";
+        if (path.equals("/auth/reset-password")) return "Link inválido, expirado ou já utilizado";
         if (ATTEMPTS_PATH.equals(path)) {
             return "answers: É obrigatório informar ao menos uma resposta";
         }
