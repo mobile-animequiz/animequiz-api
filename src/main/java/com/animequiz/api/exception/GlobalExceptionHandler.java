@@ -29,6 +29,15 @@ import java.time.LocalDateTime;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(IntegrationUnavailableException.class)
+    public ResponseEntity<APIError> handleUnavailable(IntegrationUnavailableException ex) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<APIError> handleUploadLimit(Exception ex) {
+        return build(HttpStatus.PAYLOAD_TOO_LARGE, "A foto deve ter até 2 MB");
+    }
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 

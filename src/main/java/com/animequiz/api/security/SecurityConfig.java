@@ -57,9 +57,11 @@ public class SecurityConfig {
     JwtEncoder jwtEncoder(SecretKey key) { return new NimbusJwtEncoder(new ImmutableSecret<>(key)); }
 
     @Bean
-    JwtDecoder jwtDecoder(SecretKey key, @Value("${security.jwt.issuer:animequiz-api}") String issuer) {
+    JwtDecoder jwtDecoder(SecretKey key, @Value("${security.jwt.issuer:animequiz-api}") String issuer,
+                          com.animequiz.api.repository.UserRepository users) {
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
+        decoder.setJwtValidator(new org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator<>(
+            JwtValidators.createDefaultWithIssuer(issuer), new SessionVersionValidator(users)));
         return decoder;
     }
 
@@ -84,11 +86,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login", "/api/hello",
+                                "/auth/google", "/auth/forgot-password", "/auth/reset-password",
+                                "/reset-password.html", "/reset-password.js", "/reset-password.css",
                                 "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
                                 "/h2-console/**").permitAll()
                         .requestMatchers("/api/versioned/status", "/api-keys/verify").permitAll()
                         .requestMatchers("/api-keys/**").authenticated()
                         .requestMatchers("/users/me").authenticated()
+                        .requestMatchers("/users/me/**", "/auth/google/link").authenticated()
                         .requestMatchers("/users/*/profile").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/quizzes/**", "/questions/**", "/options/**", "/scores/ranking").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/scores/**").authenticated()
