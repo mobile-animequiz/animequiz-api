@@ -342,7 +342,10 @@ public class OpenApiConfig {
                 "429", "Muitas solicitações. Aguarde e tente novamente.",
                 "503", "Integração temporariamente indisponível");
         responses.forEach((code, response) -> {
-            if (examples.containsKey(code) && (response.getContent() == null || response.getContent().isEmpty())) {
+            var media = response.getContent() == null ? null : response.getContent().get(JSON);
+            boolean documentedError = media != null && media.getSchema() != null
+                    && ERROR_SCHEMA_REF.equals(media.getSchema().get$ref()) && media.getExample() != null;
+            if (examples.containsKey(code) && !documentedError) {
                 response.setContent(error(Integer.parseInt(code), org.springframework.http.HttpStatus.valueOf(Integer.parseInt(code)).getReasonPhrase(), response.getDescription(), examples.get(code)).getContent());
             }
         });

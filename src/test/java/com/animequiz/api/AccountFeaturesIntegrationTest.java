@@ -29,6 +29,15 @@ class AccountFeaturesIntegrationTest {
     @MockBean PasswordMailer mailer;
     @MockBean GoogleIdentityVerifier google;
     @BeforeEach void mailConfiguration() { when(mailer.isConfigured()).thenReturn(true); }
+    @Test void invalidJwtUsesTheDocumentedJsonErrorShape() throws Exception {
+        mvc.perform(get("/users/me/settings").header("Authorization","Bearer token-invalido"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(header().string("WWW-Authenticate","Bearer"))
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.status").value(401))
+            .andExpect(jsonPath("$.error").value("Unauthorized"))
+            .andExpect(jsonPath("$.message").isNotEmpty());
+    }
     private record Session(String email,String token,long id) {}
     private Session register() throws Exception {
         String suffix=UUID.randomUUID().toString().replace("-","");

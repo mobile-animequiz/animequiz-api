@@ -96,8 +96,29 @@ Atrás de proxy, vários usuários podem compartilhar o IP remoto observado. Con
 
 ## Swagger e validação
 
-O histórico identifica e5805bc como introdução da apresentação customizada. /docs.html agora redireciona para /swagger-ui.html: Swagger padrão, sem vídeo, background ou CSS customizado. A escolha V1/V2 e os endpoints foram preservados.
+Tokens JWT inválidos/expirados e sessão ausente retornam APIError em JSON, HTTP 401 e WWW-Authenticate: Bearer, incluindo o filtro OAuth2. O schema de erro não herda o payload de sucesso.
 
-294 testes Java passaram com compilação --release 17 e JUnit Jupiter usando dependências disponíveis localmente. Incluem contratos legados, novos contratos OpenAPI, propriedade das contas, paginação, fotos, Google, reset/expiração/reutilização/revogação, 429, catálogo idempotente e banco fechado/reaberto. O transporte real Google/Resend não foi usado nos testes de integração; são adapters substituídos por mocks. O comando Maven padrão a executar em um ambiente com os plugins disponíveis é mvn test.
+A apresentação customizada introduzida em e5805bc e preservada em 6f2d815 foi restaurada exclusivamente para V2, com o mesmo CSS, paleta e fundo. V1 continua usando os recursos padrão do Swagger, sem injetar o CSS ou o vídeo da V2.
+
+| Acesso | Apresentação |
+|---|---|
+| /, /docs, /docs.html e /docs/v1 | Redirecionamento 302/no-store para o Swagger padrão (V1 inicial) |
+| /swagger-ui.html | V1 padrão; selecionar V2 abre sua página personalizada |
+| /docs/v2 | V2 com CSS/fundo históricos e requisições X-API-Version: 2 |
+| /docs.html?version=2 | Redirecionamento compatível para /docs/v2 |
+
+Na V2, selecionar V1 retorna ao Swagger padrão. Os endpoints e os dois documentos OpenAPI foram preservados. O APK usa contrato 1 fixo e não tem seletor de versão.
+
+302 testes Java passaram com Maven Wrapper, compilação --release 17 e JDK 25.0.2. A execução usou uma cópia isolada das mesmas fontes para preservar os arquivos de build existentes. Os quatro testes de apresentação cobrem o Swagger padrão da V1, a restauração da V2, os links antigos e o acesso público sem consumo do rate limit. Também passaram 4 testes Node de navegação, seleção e cabeçalhos (node --test src/test/js/docs-navigation.test.cjs). Google e Resend continuam substituídos por mocks nos testes de integração; não representam validação das credenciais reais.
+
+O erro anterior de ApplicationContext tinha como causa Mockito/Byte Buddy 1.14.18 executando em Java 25, acima da versão suportada por essa dependência. O POM agora fixa Byte Buddy/agent 1.18.11 de forma consistente e o Surefire carrega o agente ao iniciar a JVM, sem depender de autoanexação dinâmica ou da opção experimental. O alvo Java 17 e as imagens Java 17 do Docker foram preservados.
+
+No PowerShell, a partir da raiz que contém api e mobile, execute os testes da API com uma política limitada ao processo:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File ".\api\Run-Api.ps1" -Test
+```
+
+Não é necessário clonar novamente para corrigir este erro. Antes do merge, envie os commits novos da API e confirme a suíte. Depois do merge, atualize o clone existente preservando alterações locais.
 
 Pendente nesta entrega: credenciais reais, deploy, migração/exportação da base existente, configuração do volume e teste por rede pública.

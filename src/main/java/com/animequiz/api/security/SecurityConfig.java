@@ -88,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/register", "/auth/login", "/api/hello",
                                 "/auth/google", "/auth/forgot-password", "/auth/reset-password",
                                 "/reset-password.html", "/reset-password.js", "/reset-password.css",
+                                "/", "/docs", "/docs/v1", "/docs/v2", "/docs-v2.html", "/docs-version-switch.js",
                                 "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
                                 "/h2-console/**").permitAll()
                         .requestMatchers("/api/versioned/status", "/api-keys/verify").permitAll()
@@ -103,12 +104,12 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/users/**", "/profiles/**", "/quizzes/**", "/questions/**", "/options/**", "/scores/**").hasRole("ADMIN")
                         .requestMatchers("/users/**", "/profiles/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)))
+                .oauth2ResourceServer(oauth -> oauth
+                        .authenticationEntryPoint((request, response, exception) -> unauthorized(response, mapper))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, exception) -> {
-                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            mapper.writeValue(response.getOutputStream(), new APIError(401, "Unauthorized", "Autenticação necessária ou token inválido/expirado", LocalDateTime.now()));
+                            unauthorized(response, mapper);
                         })
                         .accessDeniedHandler((request, response, exception) -> {
                             response.setStatus(HttpStatus.FORBIDDEN.value());
@@ -116,5 +117,14 @@ public class SecurityConfig {
                             mapper.writeValue(response.getOutputStream(), new APIError(403, "Forbidden", "Você não possui permissão para executar esta operação", LocalDateTime.now()));
                         }));
         return http.build();
+    }
+
+    private static void unauthorized(jakarta.servlet.http.HttpServletResponse response, ObjectMapper mapper)
+            throws java.io.IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setHeader("WWW-Authenticate", "Bearer");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        mapper.writeValue(response.getOutputStream(), new APIError(401, "Unauthorized",
+                "Autenticação necessária ou token inválido/expirado", LocalDateTime.now()));
     }
 }

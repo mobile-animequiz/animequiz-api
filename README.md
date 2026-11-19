@@ -1,8 +1,8 @@
 # Anime Quiz API
 
-Guia atual: [perfil, favoritos, Google, recuperação, banco persistente e limites](docs/CONFIGURACAO_ENTREGA.md). São 8 quizzes/120 perguntas no seed novo; Google/Resend e deploy exigem configuração externa. Swagger padrão em /swagger-ui.html.
+Guia atual: [perfil, favoritos, Google, recuperação, banco persistente e limites](docs/CONFIGURACAO_ENTREGA.md). São 8 quizzes/120 perguntas no seed novo; Google/Resend e deploy exigem configuração externa. V1 com Swagger padrão em /swagger-ui.html; V2 com CSS e fundo originais em /docs/v2.
 
-> Atualização para a apresentação: consulte [VERSOES_E_FUNCIONALIDADES.md](VERSOES_E_FUNCIONALIDADES.md) para alternar V1/V2 no Swagger e no mobile, usar imagens nas questões e demonstrar cada funcionalidade. No Windows, `./Run-Api.ps1` inicia a API e `./Run-Api.ps1 -Test` executa a suíte.
+> Atualização para a apresentação: consulte [VERSOES_E_FUNCIONALIDADES.md](VERSOES_E_FUNCIONALIDADES.md) para consultar os contratos V1/V2 da API (o mobile usa V1 fixa), usar imagens nas questões e demonstrar cada funcionalidade. No Windows, `./Run-Api.ps1` inicia a API e `./Run-Api.ps1 -Test` executa a suíte.
 
 API REST do **Anime Quiz**, desenvolvida em Java e Spring Boot para atender o aplicativo de quizzes de anime. A API gerencia contas, perfis, quizzes, questões, alternativas e pontuações; a correção das respostas e o cálculo dos pontos acontecem no servidor.
 
@@ -106,7 +106,8 @@ A API inicia, por padrão, em `http://localhost:8080`.
 
 Com a aplicação em execução:
 
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- V1, Swagger padrão: `http://localhost:8080/swagger-ui.html`
+- V2, apresentação original: `http://localhost:8080/docs/v2`
 - Documento OpenAPI: `http://localhost:8080/api-docs`
 
 Para testar endpoints protegidos:
@@ -114,7 +115,7 @@ Para testar endpoints protegidos:
 1. Execute `POST /auth/register` ou `POST /auth/login`.
 2. Copie o valor de `accessToken` da resposta.
 3. Clique em **Authorize** no Swagger UI.
-4. Informe `Bearer <accessToken>`.
+4. Informe apenas o valor de `accessToken`; o Swagger acrescenta o prefixo `Bearer`.
 5. Execute uma operação protegida.
 
 O esquema `bearerAuth` é aplicado às operações que exigem autenticação. O Swagger não contém tokens ou senhas válidos.

@@ -1,5 +1,7 @@
 # Contrato funcional e versões da API
 
+> Revisão de 19/11/2026: a seleção V1/V2 pertence à documentação da API. O APK usa V1 fixa. Acesse V1 padrão em /swagger-ui.html e V2 com o visual original em /docs/v2. Consulte docs/CONFIGURACAO_ENTREGA.md para os testes e a configuração atuais; exemplos antigos de seleção no mobile foram substituídos.
+
 ## Selecionar e demonstrar V1/V2
 
 Ambas as versões funcionam na mesma aplicação Java e no mesmo banco. Selecione pelo cabeçalho HTTP `X-API-Version: 1` ou `X-API-Version: 2`. Sem cabeçalho, a API usa V1. Um valor diferente de 1 e 2 recebe `400` no formato `APIError`.

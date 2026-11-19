@@ -52,6 +52,30 @@ class OpenApiContractTest {
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
     }
 
+    @Test
+    void documentationEntryPointsRedirectToStandardSwaggerWithoutCustomPresentation() throws Exception {
+        for (String path : new String[]{"/", "/docs", "/docs.html"}) {
+            mockMvc.perform(get(path))
+                    .andExpect(status().isFound())
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl("/swagger-ui.html"))
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("Cache-Control", "no-store"))
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(""));
+        }
+        Map<String, Object> paths = JsonPath.read(docs(), "$.paths");
+        assertThat(paths).doesNotContainKey("/docs.html").doesNotContainKey("/");
+    }
+
+    @Test
+    void v1AuthenticationErrorsIncludeStatusDescriptionsSchemasAndExamples() throws Exception {
+        mockMvc.perform(get("/api-docs/v1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['401'].description").isNotEmpty())
+                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['401'].content['application/json'].example.status").value(401))
+                .andExpect(jsonPath("$.paths['/users/me/avatar'].put.responses['413'].content['application/json'].example.status").value(413))
+                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['503'].content['application/json'].example.status").value(503))
+                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['429'].headers['Retry-After']").exists());
+    }
+
     // ------------------------------------------------------------------ somente endpoints reais
 
     @Test
