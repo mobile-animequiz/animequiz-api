@@ -19,7 +19,7 @@ public class CorsConfig {
                 .map(String::trim).filter(value -> !value.isBlank()).toList();
         cors.setAllowedOrigins(origins);
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-API-Key", "X-API-Version", "X-Idempotency-Key"));
+        cors.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-API-Version", "X-Idempotency-Key"));
         cors.setExposedHeaders(List.of("Location", "X-API-Version", "Retry-After", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset", "X-AuthRateLimit-Limit", "X-AuthRateLimit-Remaining", "X-AuthRateLimit-Reset", "Idempotency-Replayed"));
         cors.setMaxAge(3600L);
         cors.setAllowCredentials(false);

@@ -80,25 +80,14 @@ class AdvancedFeaturesIntegrationTest {
     }
 
     @Test
-    void apiKeyIsCreatedWithJwtAndRequiredForProtectedDemoEndpoint() throws Exception {
-        User user = users.save(new User("api_key_advanced_user", "advanced-key@example.test"));
-        String body = mvc.perform(post("/api-keys")
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt.subject(user.getId().toString()))))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        var data = mapper.readTree(body);
-        String secret = data.get("apiKey").asText();
-        long id = data.get("id").asLong();
-        assertThat(secret).startsWith("aq_");
-        mvc.perform(get("/api-keys/verify"))
-                .andExpect(status().isUnauthorized());
-        mvc.perform(get("/api-keys/verify").header("X-API-Key", secret))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id));
-        mvc.perform(delete("/api-keys/" + id)
-                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt.subject(user.getId().toString()))))
-                .andExpect(status().isNoContent());
-        mvc.perform(get("/api-keys/verify").header("X-API-Key", secret))
-                .andExpect(status().isUnauthorized());
+    void apiKeyRoutesAreUnavailableToPlayersInBothVersions() throws Exception {
+        for (String version : new String[]{"1", "2"}) {
+            var player = SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt.subject("1"));
+            mvc.perform(post("/api-keys").with(player).header("X-API-Version", version))
+                .andExpect(status().isForbidden());
+            mvc.perform(get("/api-keys/verify").with(player).header("X-API-Version", version)
+                .header("X-API-Key", "aq_not_a_second_authentication_mechanism"))
+                .andExpect(status().isForbidden());
+        }
     }
 }

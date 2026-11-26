@@ -47,8 +47,7 @@ import java.util.regex.Pattern;
  */
 @Configuration
 @SecuritySchemes({
-        @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT"),
-        @SecurityScheme(name = "apiKeyAuth", type = SecuritySchemeType.APIKEY, in = io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER, paramName = "X-API-Key")
+        @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 })
 @OpenAPIDefinition(
         info = @Info(
@@ -220,31 +219,23 @@ public class OpenApiConfig {
                     .scheme("bearer")
                     .bearerFormat("JWT"));
 
-            components.addSecuritySchemes("apiKeyAuth", new io.swagger.v3.oas.models.security.SecurityScheme()
-                    .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.APIKEY)
-                    .in(io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER)
-                    .name("X-API-Key"));
-
             // O APIError não é referenciado por nenhum controller, então precisa ser registrado à mão.
             ModelConverters.getInstance().readAll(APIError.class).forEach(components::addSchemas);
 
             if (openApi.getPaths() != null) {
                 openApi.getPaths().forEach((path, item) ->
                         item.readOperationsMap().forEach((method, operation) -> {
-                            boolean keyEndpoint = path.equals("/api-keys/verify");
                             boolean admin = requiresAdmin(path, method);
                             boolean secured = admin || requiresAuthentication(path, method);
                             boolean alreadyHasBearer = operation.getSecurity() != null
                                     && operation.getSecurity().stream().anyMatch(requirement -> requirement.containsKey("bearerAuth"));
-                            if (keyEndpoint) {
-                                operation.addSecurityItem(new SecurityRequirement().addList("apiKeyAuth"));
-                            }
                             if (secured && !alreadyHasBearer) {
                                 operation.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
                             }
                             enrich(path, method, operation, secured, admin);
                         }));
             }
+            AcademicOpenApiViews.apply(openApi, "2");
         };
     }
 

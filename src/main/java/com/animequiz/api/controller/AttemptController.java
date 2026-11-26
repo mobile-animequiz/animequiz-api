@@ -93,7 +93,7 @@ public class AttemptController {
         var outcome = attemptService.submit(quizId, Long.parseLong(jwt.getSubject()), request, idempotencyKey);
         AttemptResponse response = outcome.result();
         EntityModel<AttemptResponse> model = EntityModel.of(response,
-                linkTo(methodOn(ScoreController.class).getScoreById(response.scoreId())).withRel("score"),
+                linkTo(methodOn(ScoreController.class).getScoreById(response.scoreId(), null)).withRel("score"),
                 linkTo(methodOn(QuizController.class).getQuizById(quizId)).withRel("quiz"),
                 linkTo(methodOn(ScoreController.class).getRanking(null)).withRel("ranking")
         );

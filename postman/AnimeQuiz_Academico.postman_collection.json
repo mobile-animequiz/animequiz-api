@@ -1,0 +1,899 @@
+{
+  "info": {
+    "name": "AnimeQuiz — Apresentação acadêmica V1 e V2",
+    "description": "Execute as pastas em ordem em uma API local. V1 consulta o catálogo sem token/limites; V2 cria uma conta USER, autentica, joga e altera apenas os próprios dados. A pasta de bloqueios usa o token USER obtido na V2. O cadastro gera e-mail fictício único para cada execução. Não use dados pessoais reais. Foto: no Swagger V2, PUT /users/me/avatar, multipart com campo file. Não compartilhe esta coleção após execução com o token preenchido.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": "EstudoAnimeQuiz2026!"
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "quizId",
+      "value": "1"
+    },
+    {
+      "key": "questionId",
+      "value": "1"
+    },
+    {
+      "key": "optionId",
+      "value": "1"
+    },
+    {
+      "key": "scoreId",
+      "value": ""
+    },
+    {
+      "key": "attemptKey",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "V1 — Consultas públicas",
+      "item": [
+        {
+          "name": "Disponibilidade",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "1"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/versioned/status",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"V1 sem rate limit\", () => pm.expect(pm.response.headers.has(\"X-RateLimit-Limit\")).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quizzes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "1"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes?page=0&size=10",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"V1 sem rate limit\", () => pm.expect(pm.response.headers.has(\"X-RateLimit-Limit\")).to.eql(false));",
+                  "const rows = Object.values(pm.response.json()._embedded || {}).flat();",
+                  "pm.test(\"Catálogo disponível\", () => pm.expect(rows.length).to.be.greaterThan(0));",
+                  "if (rows.length) pm.collectionVariables.set(\"quizId\", rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Perguntas com alternativas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "1"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes/{{quizId}}/questions?page=0&size=10",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"V1 sem rate limit\", () => pm.expect(pm.response.headers.has(\"X-RateLimit-Limit\")).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alternativas sem gabarito",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "1"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/options?page=0&size=10",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"V1 sem rate limit\", () => pm.expect(pm.response.headers.has(\"X-RateLimit-Limit\")).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "V2 — Fluxo do jogador (executar em ordem)",
+      "item": [
+        {
+          "name": "01 — Criar a própria conta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"Jogador Postman\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"dateOfBirth\": \"2000-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"email\", \"aluno.\" + Date.now() + \"@example.test\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "const session = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", session.accessToken);",
+                  "pm.collectionVariables.set(\"userId\", session.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Fazer login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const session = pm.response.json();",
+                  "pm.test(\"Sessão contém token\", () => pm.expect(session.accessToken).to.be.a(\"string\").and.not.empty);",
+                  "pm.collectionVariables.set(\"token\", session.accessToken);",
+                  "pm.collectionVariables.set(\"userId\", session.user.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 — Minha conta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 — Catálogo V2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes?page=0&size=10"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const rows = Object.values(pm.response.json()._embedded || {}).flat();",
+                  "pm.test(\"Catálogo disponível\", () => pm.expect(rows.length).to.be.greaterThan(0));",
+                  "if (rows.length) pm.collectionVariables.set(\"quizId\", rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 — Perguntas do quiz",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes/{{quizId}}/questions?page=0&size=10"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const rows = Object.values(pm.response.json()._embedded || {}).flat();",
+                  "pm.test(\"Perguntas disponíveis\", () => pm.expect(rows.length).to.be.greaterThan(0));",
+                  "if (rows.length && rows[0].options.length) {",
+                  " pm.collectionVariables.set(\"questionId\", rows[0].id);",
+                  " pm.collectionVariables.set(\"optionId\", rows[0].options[0].id);",
+                  "}",
+                  "pm.test(\"Sem gabarito\", () => pm.expect(pm.response.text()).not.to.include(\"isCorrect\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 — Enviar uma resposta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{attemptKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes/{{quizId}}/attempts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": {{questionId}},\n      \"optionId\": {{optionId}}\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"attemptKey\", \"postman-\" + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"scoreId\", pm.response.json().scoreId);",
+                  "pm.test(\"Resultado próprio\", () => pm.expect(String(pm.response.json().userId)).to.eql(String(pm.collectionVariables.get(\"userId\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 — Repetir a tentativa sem duplicar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{attemptKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes/{{quizId}}/attempts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": {{questionId}},\n      \"optionId\": {{optionId}}\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Reutilizou o score\", () => pm.expect(String(pm.response.json().scoreId)).to.eql(String(pm.collectionVariables.get(\"scoreId\"))));",
+                  "pm.test(\"Cabeçalho de replay\", () => pm.expect(pm.response.headers.get(\"Idempotency-Replayed\")).to.eql(\"true\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 — Consultar meu resultado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/scores/{{scoreId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 — Meu perfil e XP",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{userId}}/profile"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 — Atualizar meu nome",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/settings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Jogador da apresentação\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 — Favoritar quiz",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/favorites/{{quizId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 — Meus favoritos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/favorites?page=0&size=10"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 — Desfavoritar quiz",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/favorites/{{quizId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 — Ranking",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/scores/ranking"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "V2 — Bloqueios de acesso",
+      "item": [
+        {
+          "name": "Catálogo V2 sem JWT",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "USER não cria quizzes — cabeçalho 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "1"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "USER não cria quizzes — cabeçalho 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/quizzes",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "USER não lista todos os scores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/scores"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chaves de API desativadas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api-keys",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

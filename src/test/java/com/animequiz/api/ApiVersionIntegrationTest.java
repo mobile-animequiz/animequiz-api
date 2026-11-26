@@ -24,7 +24,7 @@ class ApiVersionIntegrationTest {
     @Autowired QuestionRepository questions;
 
     private com.fasterxml.jackson.databind.JsonNode first(String version) throws Exception {
-        String json = mvc.perform(get("/quizzes/1/questions").header("X-API-Version", version))
+        String json = mvc.perform(get("/quizzes/1/questions").with(jwt().jwt(token -> token.subject("1"))).header("X-API-Version", version))
                 .andExpect(status().isOk()).andExpect(header().string("X-API-Version", version))
                 .andReturn().getResponse().getContentAsString();
         var embedded = mapper.readTree(json).path("_embedded");
@@ -66,10 +66,10 @@ class ApiVersionIntegrationTest {
 
     @Test
     void v2RetainsPaginationAndAuthentication() throws Exception {
-        mvc.perform(get("/quizzes/1/questions").header("X-API-Version", "2").param("size", "1"))
+        mvc.perform(get("/quizzes/1/questions").with(jwt().jwt(token -> token.subject("1"))).header("X-API-Version", "2").param("size", "1"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page.totalElements").value(3))
                 .andExpect(jsonPath("$.page.totalPages").value(3));
-        mvc.perform(get("/quizzes/9999/questions").header("X-API-Version", "2")).andExpect(status().isNotFound());
+        mvc.perform(get("/quizzes/9999/questions").with(jwt().jwt(token -> token.subject("1"))).header("X-API-Version", "2")).andExpect(status().isNotFound());
         mvc.perform(post("/quizzes/1/attempts").header("X-API-Version", "2")
                 .contentType(MediaType.APPLICATION_JSON).content("{\"answers\":[{\"questionId\":1,\"optionId\":1}]}"))
                 .andExpect(status().isUnauthorized());

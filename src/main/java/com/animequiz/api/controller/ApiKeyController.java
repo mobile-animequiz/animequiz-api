@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
+@io.swagger.v3.oas.annotations.Hidden
 @RequestMapping("/api-keys")
 @Tag(name = "Recursos avancados", description = "Gerenciamento de chaves de API")
 public class ApiKeyController {
