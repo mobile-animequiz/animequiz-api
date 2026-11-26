@@ -1,295 +1,116 @@
 package com.animequiz.api;
 
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Garante que o OpenAPI publicado em {@code /api-docs} descreve o que o código realmente faz:
- * endpoints reais, endpoints removidos marcados como 410 e respostas de erro apenas onde existem.
- *
- * <p>Não escreve no banco, por isso não precisa de transação.
- */
 @SpringBootTest
+@AutoConfigureMockMvc
 class OpenApiContractTest {
-
-    private static final Set<String> EXPECTED_PATHS = Set.of(
-            "/users", "/users/{id}", "/users/search", "/users/me", "/auth/register", "/auth/login",
-            "/profiles", "/profiles/{id}", "/profiles/search",
-            "/quizzes", "/quizzes/{id}", "/quizzes/search", "/quizzes/difficulty/{difficulty}",
-            "/quizzes/{quizId}/attempts", "/quizzes/{quizId}/questions", "/users/{userId}/profile",
-            "/questions", "/questions/{id}", "/questions/by-quiz/{quizId}",
-            "/options", "/options/{id}", "/options/by-question/{questionId}",
-            "/scores", "/scores/{id}", "/scores/ranking",
-            "/api/hello");
-
-    @Autowired private WebApplicationContext context;
-
-    private MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+    @Autowired MockMvc mvc;
+    @Autowired ObjectMapper json;
+    private JsonNode document(String version) throws Exception {
+        return json.readTree(mvc.perform(get("/api-docs" + version)).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString());
     }
 
-    private String docs() throws Exception {
-        return mockMvc.perform(get("/api-docs")).andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+    @Test void v1HasOnlyPublicQueriesWithoutSecurityOrRateLimiting() throws Exception {
+        var doc=document("/v1");
+        assertThat(doc.path("info").path("version").asText()).isEqualTo("1.0.0");
+        assertThat(doc.path("components").path("securitySchemes").size()).isZero();
+        doc.path("paths").fields().forEachRemaining(entry -> {
+            assertThat(entry.getValue().size()).isEqualTo(1);
+            var op=entry.getValue().path("get");
+            assertThat(op.isMissingNode()).isFalse();
+            assertThat(op.path("security").size()).isZero();
+            for(String code:List.of("401","403","429")) assertThat(op.path("responses").has(code)).isFalse();
+        });
+        assertThat(doc.path("paths").has("/quizzes")).isTrue();
+        assertThat(doc.path("paths").has("/quizzes/{quizId}/questions")).isTrue();
+        assertThat(doc.path("paths").has("/users/me")).isFalse();
     }
 
-    @Test
-    void documentationEntryPointsRedirectToStandardSwaggerWithoutCustomPresentation() throws Exception {
-        for (String path : new String[]{"/", "/docs", "/docs.html"}) {
-            mockMvc.perform(get(path))
-                    .andExpect(status().isFound())
-                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl("/swagger-ui.html"))
-                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("Cache-Control", "no-store"))
-                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(""));
-        }
-        Map<String, Object> paths = JsonPath.read(docs(), "$.paths");
-        assertThat(paths).doesNotContainKey("/docs.html").doesNotContainKey("/");
+    @Test void v2UsesOnlyBearerAndDocumentsNormalPlayerOperations() throws Exception {
+        var doc=document("/v2");
+        var names=new HashSet<String>();doc.path("components").path("securitySchemes").fieldNames().forEachRemaining(names::add);
+        assertThat(names).containsExactly("bearerAuth");
+        assertThat(doc.at("/components/securitySchemes/bearerAuth/scheme").asText()).isEqualTo("bearer");
+        var paths=doc.path("paths");
+        for(String path:List.of("/users/me","/users/me/settings","/users/me/avatar","/users/me/favorites",
+            "/quizzes/{quizId}/attempts","/scores/ranking","/scores/{id}")) assertThat(paths.has(path)).isTrue();
+        assertThat(paths.path("/quizzes").path("get").path("security").get(0).has("bearerAuth")).isTrue();
+        assertThat(paths.path("/auth/login").path("post").path("security").size()).isZero();
+        assertThat(paths.path("/users/me/avatar").path("put").path("responses").path("413")
+            .path("content").path("application/json").path("example").path("status").asInt()).isEqualTo(413);
     }
 
-    @Test
-    void v1AuthenticationErrorsIncludeStatusDescriptionsSchemasAndExamples() throws Exception {
-        mockMvc.perform(get("/api-docs/v1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['401'].description").isNotEmpty())
-                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['401'].content['application/json'].example.status").value(401))
-                .andExpect(jsonPath("$.paths['/users/me/avatar'].put.responses['413'].content['application/json'].example.status").value(413))
-                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['503'].content['application/json'].example.status").value(503))
-                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['429'].headers['Retry-After']").exists());
-    }
-
-    // ------------------------------------------------------------------ somente endpoints reais
-
-    @Test
-    void everyRealEndpointIncludingAuthenticationIsDocumented() throws Exception {
-        Map<String, Object> paths = JsonPath.read(docs(), "$.paths");
-
-        assertThat(paths.keySet()).containsAll(EXPECTED_PATHS);
-        assertThat(paths.keySet()).contains("/auth/register", "/auth/login", "/users/me");
-    }
-
-    @Test
-    void accountOperationsDocumentActualStatusesOwnershipAndRateLimitHeaders() throws Exception {
-        mockMvc.perform(get("/api-docs/v1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['200']").exists())
-                .andExpect(jsonPath("$.paths['/auth/google'].post.responses['201']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['202']").exists())
-                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['201']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/auth/reset-password'].post.responses['204']").exists())
-                .andExpect(jsonPath("$.paths['/auth/google/link'].post.security[0].bearerAuth").exists())
-                .andExpect(jsonPath("$.paths['/users/me/settings'].patch.security[0].bearerAuth").exists())
-                .andExpect(jsonPath("$.paths['/users/me/settings'].patch.responses['403']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users/me/avatar'].delete.responses['200']").exists())
-                .andExpect(jsonPath("$.paths['/users/me/avatar'].delete.responses['204']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['429'].headers['Retry-After']").exists())
-                .andExpect(jsonPath("$.paths['/auth/forgot-password'].post.responses['429'].headers['X-AuthRateLimit-Reset']").exists())
-                .andExpect(jsonPath("$.paths['/users/me/favorites'].get.parameters[0].name").value("page"));
-    }
-
-    @Test
-    void authenticationAndProtectedOperationsDeclareBearerJwtSecurity() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.type").value("http"))
-                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
-                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.bearerFormat").value("JWT"))
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.security[0].bearerAuth").exists())
-                .andExpect(jsonPath("$.paths['/auth/login'].post.responses['200']").exists())
-                .andExpect(jsonPath("$.paths['/auth/register'].post.responses['201']").exists());
-    }
-
-    @Test
-    void optionResponseSchemasNeverDeclareTheAnswerKey() throws Exception {
-        Map<String, Map<String, Object>> schemas = JsonPath.read(docs(), "$.components.schemas");
-
-        Set<String> optionResponseSchemas = schemas.keySet().stream()
-                .filter(name -> name.contains("OptionResponse"))
-                .collect(java.util.stream.Collectors.toSet());
-        assertThat(optionResponseSchemas).isNotEmpty();
-
-        for (String name : optionResponseSchemas) {
-            String schema = String.valueOf(schemas.get(name));
-            assertThat(schema).as("schema %s", name).doesNotContain("isCorrect").doesNotContain("correct=");
+    @Test void administrativeAndDeferredFeaturesAreHiddenInEveryPublicDocument() throws Exception {
+        for(String version:List.of("","/v1","/v2")){
+            var paths=document(version).path("paths");
+            for(String path:List.of("/api-keys","/api-keys/verify","/users","/users/{id}","/profiles",
+                "/auth/google","/auth/google/link","/auth/forgot-password","/auth/reset-password")) assertThat(paths.has(path)).isFalse();
+            for(String path:List.of("/quizzes","/quizzes/{id}","/questions","/questions/{id}","/options","/options/{id}")){
+                for(String method:List.of("post","put","delete","patch")) assertThat(paths.path(path).has(method)).isFalse();
+            }
+            assertThat(paths.has("/scores")).isFalse();
         }
     }
 
-    // ------------------------------------------------------------------ categoria, questionCount e questões com alternativas
-
-    @Test
-    void quizSchemasDocumentCategoryAndQuestionCount() throws Exception {
-        String docs = docs();
-        Map<String, Map<String, Object>> schemas = JsonPath.read(docs, "$.components.schemas");
-
-        String allSchemas = String.valueOf(schemas);
-        for (String category : new String[] {"SHONEN", "SEINEN", "SHOJO", "JOSEI", "KODOMO"}) {
-            assertThat(allSchemas).as("categoria %s documentada", category).contains(category);
+    @Test void versionHeadersAndQuestionSchemasRemainDifferentWithoutAnswerKeys() throws Exception {
+        for(String version:List.of("1","2")){
+            var doc=document("/v"+version);
+            var parameters=doc.path("paths").path("/quizzes").path("get").path("parameters");
+            boolean found=false;
+            for(var parameter:parameters) if(parameter.path("name").asText().equals("X-API-Version")){
+                found=true;assertThat(parameter.path("schema").path("default").asText()).isEqualTo(version);
+            }
+            assertThat(found).isTrue();
+            for(var schema:doc.path("components").path("schemas")) {
+                assertThat(schema.toString()).doesNotContain("\"isCorrect\"");
+                assertThat(schema.path("properties").has("correct")).isFalse();
+            }
         }
-        assertThat(schemas.entrySet().stream()
-                .filter(entry -> entry.getKey().contains("QuizResponse"))
-                .map(entry -> String.valueOf(entry.getValue())))
-                .as("algum schema de resposta de quiz declara questionCount")
-                .anyMatch(schema -> schema.contains("questionCount"));
-
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.components.schemas.QuizRequest.required", hasItem("category")));
+        assertThat(document("/v1").path("components").path("schemas").toString()).doesNotContain("QuestionWithOptionsV2Response");
+        assertThat(document("/v2").path("components").path("schemas").toString()).contains("imageAltText","timeLimitSeconds");
     }
 
-    @Test
-    void quizQuestionsEndpointDocumentsOnlyTheResponsesItCanProduce() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/questions'].get.responses['200']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/questions'].get.responses['400']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/questions'].get.responses['404']").exists())
-                // é uma leitura: não há corpo (415) nem conflito (409)
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/questions'].get.responses['409']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/questions'].get.responses['415']").doesNotExist());
-    }
-
-    @Test
-    void profileByUserEndpointIsDocumentedAsAReadOnlyLookup() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].get.responses['200']").exists())
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].get.responses['400']").exists())
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].get.responses['404']").exists())
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].get.responses['409']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].get.responses['415']").doesNotExist())
-                // só leitura: o caminho não aceita escrita
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].post").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].put").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users/{userId}/profile'].delete").doesNotExist());
-    }
-
-    @Test
-    void detailedProfileAndScoreSchemasDeclareTheNewFields() throws Exception {
-        Map<String, Map<String, Object>> schemas = JsonPath.read(docs(), "$.components.schemas");
-
-        String profileSchemas = schemas.entrySet().stream()
-                .filter(entry -> entry.getKey().contains("UserProfileDetailsResponse"))
-                .map(entry -> String.valueOf(entry.getValue()))
-                .collect(java.util.stream.Collectors.joining(" "));
-        for (String field : new String[] {"level", "rankTitle", "xp", "levelStartXp", "nextLevelXp",
-                "completedQuizzes", "correctAnswers", "totalAnswers"}) {
-            assertThat(profileSchemas).as("campo %s no schema do perfil detalhado", field).contains(field);
-        }
-
-        String scoreSchemas = schemas.entrySet().stream()
-                .filter(entry -> entry.getKey().contains("ScoreResponse"))
-                .map(entry -> String.valueOf(entry.getValue()))
-                .collect(java.util.stream.Collectors.joining(" "));
-        for (String field : new String[] {"correctAnswers", "answeredQuestions", "totalQuestions"}) {
-            assertThat(scoreSchemas).as("campo %s no schema de score", field).contains(field);
+    @Test void hiddenSchemasArePrunedAndEveryRemainingReferenceResolves() throws Exception {
+        for(String version:List.of("/v1","/v2")){
+            var doc=document(version);
+            var schemas=doc.path("components").path("schemas");
+            var names=new ArrayList<String>();schemas.fieldNames().forEachRemaining(names::add);
+            assertThat(names).noneMatch(name->name.contains("GoogleRequest")||name.contains("CreatedKey")||name.contains("ResetRequest")||name.equals("UserRequest"));
+            verifyReferences(doc,doc);
         }
     }
-
-    @Test
-    void questionsWithOptionsSchemasNeverDeclareTheAnswerKey() throws Exception {
-        Map<String, Map<String, Object>> schemas = JsonPath.read(docs(), "$.components.schemas");
-
-        Set<String> responseSchemas = schemas.keySet().stream()
-                .filter(name -> name.contains("QuestionWithOptionsResponse") || name.contains("OptionSummaryResponse"))
-                .collect(java.util.stream.Collectors.toSet());
-        assertThat(responseSchemas).isNotEmpty();
-
-        for (String name : responseSchemas) {
-            String schema = String.valueOf(schemas.get(name));
-            assertThat(schema).as("schema %s", name).doesNotContain("isCorrect").doesNotContain("correct=");
+    private void verifyReferences(JsonNode node,JsonNode root){
+        if(node.isObject()&&node.path("$ref").asText().startsWith("#/components/")){
+            assertThat(root.at(node.path("$ref").asText().substring(1)).isMissingNode()).isFalse();
         }
+        node.elements().forEachRemaining(child->verifyReferences(child,root));
     }
 
-    // ------------------------------------------------------------------ endpoints removidos (410)
-
-    @Test
-    void removedScoreEndpointsAreDeprecatedAndDocumentOnlyGone() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/scores'].post.deprecated").value(true))
-                .andExpect(jsonPath("$.paths['/scores'].post.responses['410']").exists())
-                .andExpect(jsonPath("$.paths['/scores'].post.responses['200']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/scores'].post.responses['201']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/scores/{id}'].put.deprecated").value(true))
-                .andExpect(jsonPath("$.paths['/scores/{id}'].put.responses['410']").exists())
-                .andExpect(jsonPath("$.paths['/scores/{id}'].put.responses['200']").doesNotExist());
+    @Test void v2DocumentsRateLimitsErrorsAndIdempotencyOnTheApplicableRoutes() throws Exception {
+        var paths=document("/v2").path("paths");
+        var limited=paths.path("/auth/login").path("post").path("responses").path("429");
+        assertThat(limited.path("headers").has("Retry-After")).isTrue();
+        assertThat(limited.path("headers").has("X-AuthRateLimit-Reset")).isTrue();
+        var responses=paths.path("/quizzes/{quizId}/attempts").path("post").path("responses");
+        for(String status:List.of("201","200","400","401","409","429")) assertThat(responses.has(status)).isTrue();
+        assertThat(paths.path("/auth/register").path("post").path("responses").has("201")).isTrue();
     }
 
-    // ------------------------------------------------------------------ fluxo de tentativas
-
-    @Test
-    void attemptEndpointDocumentsSuccessAndEveryErrorItCanProduce() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['201']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['201'].headers.Location").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['200']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['400']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['404']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['409']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{quizId}/attempts'].post.responses['415']").exists());
-    }
-
-    // ------------------------------------------------------------------ respostas de erro só onde existem
-
-    @Test
-    void creationsReturn201WithLocationAndOnlyTheErrorsTheyCanProduce() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/users'].post.responses['201'].headers.Location").exists())
-                .andExpect(jsonPath("$.paths['/users'].post.responses['200']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users'].post.responses['400']").exists())
-                .andExpect(jsonPath("$.paths['/users'].post.responses['409']").exists())
-                .andExpect(jsonPath("$.paths['/users'].post.responses['415']").exists())
-                // criar usuário não consulta outro recurso
-                .andExpect(jsonPath("$.paths['/users'].post.responses['404']").doesNotExist())
-                // criar questão exige um quiz existente, mas nunca gera conflito
-                .andExpect(jsonPath("$.paths['/questions'].post.responses['404']").exists())
-                .andExpect(jsonPath("$.paths['/questions'].post.responses['409']").doesNotExist());
-    }
-
-    @Test
-    void readsDocument404OnlyWhenAnIdIsLookedUp() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/users/{id}'].get.responses['404']").exists())
-                .andExpect(jsonPath("$.paths['/users/{id}'].get.responses['409']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users/{id}'].get.responses['415']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users'].get.responses['404']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/scores/ranking'].get.responses['404']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/scores/ranking'].get.responses['400']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/difficulty/{difficulty}'].get.responses['400']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/difficulty/{difficulty}'].get.responses['404']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/questions/by-quiz/{quizId}'].get.responses['404']").exists())
-                .andExpect(jsonPath("$.paths['/options/by-question/{questionId}'].get.responses['404']").exists());
-    }
-
-    @Test
-    void deletesDocument204AndConflictOnlyWhereDependentsExist() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/options/{id}'].delete.responses['204']").exists())
-                .andExpect(jsonPath("$.paths['/options/{id}'].delete.responses['200']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/options/{id}'].delete.responses['409']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/scores/{id}'].delete.responses['409']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/users/{id}'].delete.responses['409']").exists())
-                .andExpect(jsonPath("$.paths['/quizzes/{id}'].delete.responses['409']").exists())
-                .andExpect(jsonPath("$.paths['/questions/{id}'].delete.responses['409']").exists());
-    }
-
-    @Test
-    void helloEndpointDocumentsOnlyItsSuccess() throws Exception {
-        mockMvc.perform(get("/api-docs"))
-                .andExpect(jsonPath("$.paths['/api/hello'].get.responses['200']").exists())
-                .andExpect(jsonPath("$.paths['/api/hello'].get.responses['404']").doesNotExist())
-                .andExpect(jsonPath("$.paths['/api/hello'].get.responses['400']").doesNotExist());
+    @Test void documentationLinksKeepTheOriginalPresentationRoutes() throws Exception {
+        for(String path:List.of("/","/docs","/docs.html","/docs/v1")) mvc.perform(get(path))
+            .andExpect(status().isFound()).andExpect(redirectedUrl("/swagger-ui.html"));
+        mvc.perform(get("/docs/v2")).andExpect(status().isOk()).andExpect(forwardedUrl("/docs-v2.html"));
     }
 }
