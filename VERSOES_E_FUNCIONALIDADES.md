@@ -1,3 +1,5 @@
+> **Documento histórico.** Este arquivo registra uma etapa anterior. Para a apresentação acadêmica atual (25/11/2026), consulte o [README](README.md). As consultas públicas V1 não usam autenticação/limites; a V2 usa somente JWT Bearer. CRUD administrativo e integrações adiadas ficam fora do Swagger público. Orientações antigas sobre chaves de API, permissões e estado de testes não representam esta revisão.
+
 # Contrato funcional e versões da API
 
 > Revisão de 19/11/2026: a seleção V1/V2 pertence à documentação da API. O APK usa V1 fixa. Acesse V1 padrão em /swagger-ui.html e V2 com o visual original em /docs/v2. Consulte docs/CONFIGURACAO_ENTREGA.md para os testes e a configuração atuais; exemplos antigos de seleção no mobile foram substituídos.

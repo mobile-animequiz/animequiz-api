@@ -1,3 +1,5 @@
+> **Documento histórico.** Este arquivo registra uma etapa anterior. Para a apresentação acadêmica atual (25/11/2026), consulte o [README](README.md). As consultas públicas V1 não usam autenticação/limites; a V2 usa somente JWT Bearer. CRUD administrativo e integrações adiadas ficam fora do Swagger público. Orientações antigas sobre chaves de API, permissões e estado de testes não representam esta revisão.
+
 # Relatório de revisão de acabamento — Anime Quiz API
 
 ## Escopo

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-25 — Apresentação acadêmica V1 e V2
+
+- V1 resumida para consultas públicas de catálogo e status, sem esquemas de autorização nem rate limit nessas consultas.
+- V2 com JWT Bearer como único esquema, catálogo autenticado e ações do jogador sobre os próprios dados.
+- CRUD administrativo, chaves de API e integrações adiadas ocultados das documentações públicas; rotas de chaves de API bloqueadas.
+- Autorização real mantida para comandos e dados privados, inclusive quando o cliente envia o cabeçalho V1.
+- Consulta individual de score restrita ao titular ou ADMIN; listagem global de scores reservada a ADMIN.
+- Links administrativos retirados das respostas básicas e das respostas do jogador.
+- README refeito com execução, contratos, permissões, limites, erros, arquitetura e roteiro de demonstração; coleção Postman adicionada.
+- Páginas HTML, CSS e JavaScript de apresentação preservadas integralmente em relação ao ZIP recebido.
+
 ## Revisão de acabamento e documentação
 
 - README atualizado para refletir os contratos atuais de cadastro, login, JWT, usuário autenticado e tentativas.
