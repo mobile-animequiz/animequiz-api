@@ -1,6 +1,7 @@
 package com.animequiz.api.configuration;
 
 import com.animequiz.api.dto.APIError;
+import com.animequiz.api.security.AcademicVersionPolicy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,6 +37,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || AcademicVersionPolicy.isV1Read(request.getMethod(),
+                    AcademicVersionPolicy.path(request.getRequestURI(), request.getContextPath()),
+                    request.getHeader("X-API-Version"))
                 || request.getRequestURI().startsWith("/swagger-ui")
                 || request.getRequestURI().startsWith("/api-docs")
                 || request.getRequestURI().equals("/docs.html")

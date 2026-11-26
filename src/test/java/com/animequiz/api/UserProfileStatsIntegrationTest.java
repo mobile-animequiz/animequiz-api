@@ -356,7 +356,8 @@ class UserProfileStatsIntegrationTest {
                 "completedQuizzes", "correctAnswers", "totalAnswers", "_links");
         assertThat(fields).doesNotContain("totalQuestions", "answeredQuestions", "isCorrect", "correct");
         assertThat(node.path("_links").has("self")).isTrue();
-        assertThat(node.path("_links").has("profile")).isTrue();
+        // The legacy /profiles/{id} link is administrative and stays out of the basic V1 response.
+        assertThat(node.path("_links").has("profile")).isFalse();
     }
 
     @Test

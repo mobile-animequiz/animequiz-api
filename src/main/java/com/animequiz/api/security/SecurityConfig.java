@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.SecretKey;
@@ -78,6 +79,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtConverter,
                                              ObjectMapper mapper) throws Exception {
+        var bearerResolver = new DefaultBearerTokenResolver();
         http.cors(org.springframework.security.config.Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
@@ -91,13 +93,17 @@ public class SecurityConfig {
                                 "/", "/docs", "/docs/v1", "/docs/v2", "/docs-v2.html", "/docs-version-switch.js",
                                 "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
                                 "/h2-console/**").permitAll()
-                        .requestMatchers("/api/versioned/status", "/api-keys/verify").permitAll()
-                        .requestMatchers("/api-keys/**").authenticated()
+                        .requestMatchers("/api/versioned/status").permitAll()
+                        .requestMatchers("/api-keys/**").denyAll()
                         .requestMatchers("/users/me").authenticated()
                         .requestMatchers("/users/me/**", "/auth/google/link").authenticated()
                         .requestMatchers("/users/*/profile").authenticated()
+                        .requestMatchers(request -> AcademicVersionPolicy.isV2Catalog(request.getMethod(),
+                                AcademicVersionPolicy.path(request.getRequestURI(), request.getContextPath()),
+                                request.getHeader("X-API-Version"))).authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/quizzes/**", "/questions/**", "/options/**", "/scores/ranking").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/scores/**").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/scores/{id}").authenticated()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/scores/**").hasRole("ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/quizzes/*/attempts").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/users", "/users/**", "/profiles/**", "/quizzes/**", "/questions/**", "/options/**", "/scores/**").hasRole("ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.PUT, "/users/**", "/profiles/**", "/quizzes/**", "/questions/**", "/options/**", "/scores/**").hasRole("ADMIN")
@@ -105,6 +111,9 @@ public class SecurityConfig {
                         .requestMatchers("/users/**", "/profiles/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
+                        .bearerTokenResolver(request -> AcademicVersionPolicy.isV1Read(request.getMethod(),
+                                AcademicVersionPolicy.path(request.getRequestURI(), request.getContextPath()),
+                                request.getHeader("X-API-Version")) ? null : bearerResolver.resolve(request))
                         .authenticationEntryPoint((request, response, exception) -> unauthorized(response, mapper))
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)))
                 .exceptionHandling(ex -> ex

@@ -13,6 +13,9 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -47,10 +50,14 @@ public class ScoreController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar pontuação por ID")
-    public ResponseEntity<EntityModel<ScoreResponse>> getScoreById(@PathVariable Long id) {
+    public ResponseEntity<EntityModel<ScoreResponse>> getScoreById(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         ScoreResponse response = scoreService.getScoreById(id);
+        boolean admin = jwt.getClaimAsStringList("roles") != null && jwt.getClaimAsStringList("roles").contains("ADMIN");
+        if (!admin && !response.userId().toString().equals(jwt.getSubject())) {
+            throw new AccessDeniedException("Você só pode consultar a própria pontuação");
+        }
         EntityModel<ScoreResponse> model = EntityModel.of(response,
-                linkTo(methodOn(ScoreController.class).getScoreById(id)).withSelfRel(),
+                linkTo(methodOn(ScoreController.class).getScoreById(id, null)).withSelfRel(),
                 linkTo(methodOn(ScoreController.class).getAllScores(null)).withRel("all-scores")
         );
         return ResponseEntity.ok(model);
@@ -61,7 +68,7 @@ public class ScoreController {
     public ResponseEntity<PagedModel<EntityModel<ScoreResponse>>> getAllScores(@ParameterObject Pageable pageable) {
         Page<ScoreResponse> page = scoreService.getAllScores(pageable);
         PagedModel<EntityModel<ScoreResponse>> model = pagedAssembler.toModel(page,
-                res -> EntityModel.of(res, linkTo(methodOn(ScoreController.class).getScoreById(res.id())).withSelfRel())
+                res -> EntityModel.of(res, linkTo(methodOn(ScoreController.class).getScoreById(res.id(), null)).withSelfRel())
         );
         return ResponseEntity.ok(model);
     }
@@ -71,7 +78,7 @@ public class ScoreController {
     public ResponseEntity<PagedModel<EntityModel<ScoreResponse>>> getRanking(@ParameterObject Pageable pageable) {
         Page<ScoreResponse> page = scoreService.getRanking(pageable);
         PagedModel<EntityModel<ScoreResponse>> model = pagedAssembler.toModel(page,
-                res -> EntityModel.of(res, linkTo(methodOn(ScoreController.class).getScoreById(res.id())).withSelfRel())
+                res -> EntityModel.of(res, linkTo(methodOn(ScoreController.class).getScoreById(res.id(), null)).withSelfRel())
         );
         return ResponseEntity.ok(model);
     }
