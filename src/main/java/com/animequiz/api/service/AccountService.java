@@ -45,10 +45,10 @@ public class AccountService {
             value.setDisplayName(name);
         }
         if(request.theme()!=null) {
-            require(Set.of("midnight","eclipse"),request.theme()); value.setTheme(request.theme());
+            require(Set.of("midnight","eclipse","ocean","forest"),request.theme()); value.setTheme(request.theme());
         }
         if(request.accent()!=null) {
-            require(Set.of("violet","cyan","rose"),request.accent()); value.setAccent(request.accent());
+            require(Set.of("violet","cyan","rose","amber","mint","coral"),request.accent()); value.setAccent(request.accent());
         }
         if(request.locale()!=null) {
             require(Set.of("pt-BR","en","device"),request.locale()); value.setLocale(request.locale());
@@ -117,9 +117,16 @@ public class AccountService {
     }
     private AccountSettingsResponse response(User owner, AccountSettings value) {
         return new AccountSettingsResponse(owner.getId(),
-            value.getDisplayName()==null ? owner.getUsername() : value.getDisplayName(),
+            value.getDisplayName()==null ? defaultName(owner) : value.getDisplayName(),
             value.getTheme(),value.getAccent(),value.getLocale(),value.getAvatar()!=null,
             value.getAvatarVersion(),owner.getGoogleSubject()!=null);
+    }
+    private static String defaultName(User user) {
+        String username = user.getUsername();
+        if (username != null && !username.matches("(?i)jogador[a-z0-9]{16}")) return username;
+        String first = user.getEmail().split("@", 2)[0].split("[._+\\-0-9]", 2)[0];
+        if (first.isBlank()) first = user.getEmail().split("@", 2)[0];
+        return first.substring(0, 1).toUpperCase(java.util.Locale.ROOT) + first.substring(1);
     }
     public record Avatar(byte[] bytes,String type,long version) {}
 }

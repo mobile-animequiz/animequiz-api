@@ -52,13 +52,13 @@ class OpenApiContractTest {
             .path("content").path("application/json").path("example").path("status").asInt()).isEqualTo(413);
     }
 
-    @Test void administrativeAndDeferredFeaturesAreHiddenInEveryPublicDocument() throws Exception {
+    @Test void deferredFeaturesStayHiddenAndOnlyV2DocumentsProtectedAdministration() throws Exception {
         for(String version:List.of("","/v1","/v2")){
             var paths=document(version).path("paths");
             for(String path:List.of("/api-keys","/api-keys/verify","/users","/users/{id}","/profiles",
                 "/auth/google","/auth/google/link","/auth/forgot-password","/auth/reset-password")) assertThat(paths.has(path)).isFalse();
             for(String path:List.of("/quizzes","/quizzes/{id}","/questions","/questions/{id}","/options","/options/{id}")){
-                for(String method:List.of("post","put","delete","patch")) assertThat(paths.path(path).has(method)).isFalse();
+                for(String method:List.of("post","put","delete","patch")) if (version.equals("/v1")) assertThat(paths.path(path).has(method)).isFalse();
             }
             assertThat(paths.has("/scores")).isFalse();
         }
@@ -74,7 +74,8 @@ class OpenApiContractTest {
             }
             assertThat(found).isTrue();
             for(var schema:doc.path("components").path("schemas")) {
-                assertThat(schema.toString()).doesNotContain("\"isCorrect\"");
+                if (!schema.equals(doc.path("components").path("schemas").path("OptionRequest")))
+                    assertThat(schema.toString()).doesNotContain("\"isCorrect\"");
                 assertThat(schema.path("properties").has("correct")).isFalse();
             }
         }

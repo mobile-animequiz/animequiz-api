@@ -11,6 +11,7 @@ public interface OptionView {
     Long getId();
 
     String getText();
+    String getEnglishText();
 
     Long getQuestionId();
 }

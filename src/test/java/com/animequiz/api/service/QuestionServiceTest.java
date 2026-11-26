@@ -61,6 +61,7 @@ class QuestionServiceTest {
 
     private static OptionView option(long id, String text, long questionId) {
         return new OptionView() {
+            public String getEnglishText() { return null; }
             public Long getId() { return id; }
             public String getText() { return text; }
             public Long getQuestionId() { return questionId; }

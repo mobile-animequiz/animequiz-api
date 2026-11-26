@@ -22,7 +22,11 @@ public record QuestionRequest(
 
         @jakarta.validation.constraints.Min(5)
         @jakarta.validation.constraints.Max(300)
-        Integer timeLimitSeconds
+        Integer timeLimitSeconds,
+        @Size(max = 255) String englishText
 ) {
-    public QuestionRequest(Long quizId, String text) { this(quizId, text, null, null, null); }
+    public QuestionRequest(Long quizId, String text) { this(quizId, text, null, null, null, null); }
+    public QuestionRequest(Long quizId, String text, String imageUrl, String imageAltText, Integer seconds) {
+        this(quizId, text, imageUrl, imageAltText, seconds, null);
+    }
 }

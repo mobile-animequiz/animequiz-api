@@ -72,7 +72,7 @@ class DtoContractTest {
 
     @Test
     void quizRequestCarriesCategoryButNeverTheQuestionCount() {
-        assertThat(components(QuizRequest.class)).containsExactly("title", "description", "difficulty", "category");
+        assertThat(components(QuizRequest.class)).containsExactly("title", "description", "difficulty", "category", "imageUrl", "imageAltText", "englishTitle", "englishDescription");
     }
 
     @Test

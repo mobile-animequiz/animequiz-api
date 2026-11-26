@@ -29,6 +29,7 @@ public class OptionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Questão não encontrada com ID: " + request.questionId()));
 
         Option option = new Option(question, request.text(), request.isCorrect());
+        option.setEnglishText(request.englishText());
         return toResponse(optionRepository.save(option));
     }
 
@@ -62,6 +63,7 @@ public class OptionService {
 
         option.setQuestion(question);
         option.setText(request.text());
+        option.setEnglishText(request.englishText());
         option.setCorrect(request.isCorrect());
 
         return toResponse(optionRepository.save(option));

@@ -33,6 +33,9 @@ public class Question {
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
+    @Column(length = 255)
+    private String englishText;
+
     public Question() {}
     public Question(String statement, Quiz quiz) {
         this.statement = statement;
@@ -65,4 +68,6 @@ public class Question {
     public void setText(String text) {
         this.statement = text;
     }
+    public String getEnglishText() { return englishText; }
+    public void setEnglishText(String value) { englishText = value; }
 }

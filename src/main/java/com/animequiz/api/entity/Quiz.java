@@ -35,6 +35,18 @@ public class Quiz {
     @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY)
     private java.util.Set<Question> questions = new java.util.HashSet<>();
 
+    @Column(length = 1000)
+    private String imageUrl;
+
+    @Column(length = 255)
+    private String imageAltText;
+
+    @Column(length = 100)
+    private String englishTitle;
+
+    @Column(length = 255)
+    private String englishDescription;
+
     public Quiz() {}
 
     public Quiz(String title, String description, Difficulty difficulty, Category category) {
@@ -58,4 +70,12 @@ public class Quiz {
 
     public Category getCategory() { return category; }
     public void setCategory(Category category) { this.category = category; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String value) { imageUrl = value; }
+    public String getImageAltText() { return imageAltText; }
+    public void setImageAltText(String value) { imageAltText = value; }
+    public String getEnglishTitle() { return englishTitle; }
+    public void setEnglishTitle(String value) { englishTitle = value; }
+    public String getEnglishDescription() { return englishDescription; }
+    public void setEnglishDescription(String value) { englishDescription = value; }
 }

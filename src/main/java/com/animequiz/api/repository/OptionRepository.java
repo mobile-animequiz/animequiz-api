@@ -28,7 +28,7 @@ public interface OptionRepository extends JpaRepository<Option, Long> {
      * Alternativas de várias questões em UMA consulta, ordenadas por ID e SEM o gabarito
      * (a projeção não seleciona a coluna {@code correct}). Usada por {@code GET /quizzes/{quizId}/questions}.
      */
-    @Query("select o.id as id, o.text as text, o.question.id as questionId from Option o " +
+    @Query("select o.id as id, o.text as text, o.englishText as englishText, o.question.id as questionId from Option o " +
             "where o.question.id in :questionIds order by o.id asc")
     List<OptionView> findViewsByQuestionIds(@Param("questionIds") Collection<Long> questionIds);
 }

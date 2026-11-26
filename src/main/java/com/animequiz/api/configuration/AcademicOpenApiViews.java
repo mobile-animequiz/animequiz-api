@@ -23,6 +23,7 @@ public final class AcademicOpenApiViews {
     private static boolean visible(String version, String path, PathItem.HttpMethod method) {
         if (AcademicVersionPolicy.V1_PATHS.contains(path) && method == PathItem.HttpMethod.GET) return true;
         if (version.equals("1")) return false;
+        if (Set.of("/quizzes", "/quizzes/{id}", "/questions", "/questions/{id}", "/options", "/options/{id}").contains(path)) return true;
         if (path.equals("/scores/ranking")) return method == PathItem.HttpMethod.GET;
         if (path.equals("/scores/{id}")) return method == PathItem.HttpMethod.GET;
         if (PUBLIC_SESSION.contains(path)) return method == PathItem.HttpMethod.POST;
@@ -64,7 +65,9 @@ public final class AcademicOpenApiViews {
                     Paginação começa em page=0. Favoritos aceitam size de 1 a 50. JPEG/PNG de até 2 MiB podem ser
                     enviados em multipart/form-data no campo file; o download da foto exige o Bearer da própria conta.
                     As perguntas V2 acrescentam imageUrl, imageAltText e timeLimitSeconds quando disponíveis.
-                    Google, recuperação de senha, chaves de API e CRUD administrativo foram ocultados desta apresentação.
+                    Cadastro de quizzes, perguntas e alternativas exige ADMIN; o login de um jogador comum não concede essa permissão.
+                    lang seleciona pt-BR/en; as capas pertencem ao quiz. Tempos por dificuldade: 30/20/12 segundos.
+                    Google, recuperação de senha e chaves de API continuam ocultos.
                     """);
         }
         api.setSecurity(new ArrayList<>());
@@ -91,6 +94,11 @@ public final class AcademicOpenApiViews {
 
     private static void customize(Operation op, String path, boolean basic, String version) {
         op.setSecurity(new ArrayList<>());
+        if (!basic && Set.of("/quizzes", "/quizzes/{id}", "/questions", "/questions/{id}", "/options", "/options/{id}").contains(path)
+                && op.getRequestBody() != null) {
+            op.setSummary("[ADMIN] " + op.getSummary());
+            op.setDescription("Somente ADMIN pode executar esta operação. Jogadores recebem 403. Campos de imagem e tradução são opcionais.");
+        }
         if (!basic && !PUBLIC_SESSION.contains(path) && !SHARED_READS.contains(path)) {
             op.addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
             op.getResponses().putIfAbsent("401", new ApiResponse().description("Token ausente, inválido ou expirado")

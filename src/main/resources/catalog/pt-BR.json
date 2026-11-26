@@ -5,7 +5,8 @@
     "difficulty": "FACIL",
     "category": "SHONEN",
     "sources": [
-      "https://en.wikipedia.org/wiki/List_of_Naruto_characters"
+      "https://en.wikipedia.org/wiki/List_of_Naruto_characters",
+      "https://naruto-official.com/en/news/01_1521"
     ],
     "questions": [
       [
@@ -112,10 +113,17 @@
         "ANBU",
         "Time 7",
         "Os Sete Espadachins"
+      ],
+      [
+        "Que natureza de chakra Naruto combina ao Rasengan para criar o Rasen Shuriken?",
+        "Vento",
+        "Relâmpago",
+        "Terra",
+        "Água"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "One Piece Quiz",
@@ -124,7 +132,8 @@
     "category": "SHONEN",
     "sources": [
       "https://en.wikipedia.org/wiki/List_of_One_Piece_characters",
-      "https://en.wikipedia.org/wiki/Straw_Hat_Pirates"
+      "https://en.wikipedia.org/wiki/Straw_Hat_Pirates",
+      "https://onepiece.fandom.com/pt/wiki/Ope_Ope_no_Mi"
     ],
     "questions": [
       [
@@ -231,10 +240,17 @@
         "Arlong",
         "Hody Jones",
         "Fisher Tiger"
+      ],
+      [
+        "A Ope Ope no Mi, usada por Law, pertence a qual categoria de Akuma no Mi?",
+        "Paramecia",
+        "Logia",
+        "Zoan ancestral",
+        "Zoan mítica"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "Dragon Ball — Escola de Guerreiros",
@@ -243,7 +259,8 @@
     "category": "SHONEN",
     "sources": [
       "https://en.wikipedia.org/wiki/List_of_Dragon_Ball_characters",
-      "https://en.wikipedia.org/wiki/Dragon_Ball"
+      "https://en.wikipedia.org/wiki/Dragon_Ball",
+      "https://en.dragon-ball-official.com/news/01_971.html"
     ],
     "questions": [
       [
@@ -350,10 +367,17 @@
         "Pilaf",
         "Majin Buu",
         "Tao Pai Pai"
+      ],
+      [
+        "Qual guerreiro nasce da fusão de Goku e Vegeta usando os brincos Potara?",
+        "Vegetto",
+        "Gogeta",
+        "Gotenks",
+        "Kibitoshin"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "Demon Slayer — Primeira Missão",
@@ -361,7 +385,8 @@
     "difficulty": "MEDIO",
     "category": "SHONEN",
     "sources": [
-      "https://en.wikipedia.org/wiki/List_of_Demon_Slayer:_Kimetsu_no_Yaiba_characters"
+      "https://en.wikipedia.org/wiki/List_of_Demon_Slayer:_Kimetsu_no_Yaiba_characters",
+      "https://demonslayer-anime.com/eda/character/?id=05"
     ],
     "questions": [
       [
@@ -468,10 +493,17 @@
         "Zanpakutō",
         "Shusui",
         "Samehada"
+      ],
+      [
+        "Antes de se tornar Hashira, qual era a formação de Tengen Uzui?",
+        "Shinobi",
+        "Monge",
+        "Ferreiro",
+        "Médico"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "My Hero Academia — Classe de Heróis",
@@ -479,7 +511,8 @@
     "difficulty": "FACIL",
     "category": "SHONEN",
     "sources": [
-      "https://en.wikipedia.org/wiki/List_of_My_Hero_Academia_characters"
+      "https://en.wikipedia.org/wiki/List_of_My_Hero_Academia_characters",
+      "https://myheroacademia.fandom.com/wiki/Daigoro_Banjo"
     ],
     "questions": [
       [
@@ -586,10 +619,17 @@
         "Shiketsu",
         "Ketsubutsu",
         "Isamu"
+      ],
+      [
+        "Qual quinto portador do One For All possuía originalmente o Chicote Negro?",
+        "Daigoro Banjo",
+        "Nana Shimura",
+        "Hikage Shinomori",
+        "En"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "Fullmetal Alchemist — Troca Equivalente",
@@ -598,7 +638,8 @@
     "category": "SHONEN",
     "sources": [
       "https://en.wikipedia.org/wiki/List_of_Fullmetal_Alchemist_characters",
-      "https://en.wikipedia.org/wiki/Fullmetal_Alchemist"
+      "https://en.wikipedia.org/wiki/Fullmetal_Alchemist",
+      "https://fma.fandom.com/wiki/King_Bradley/Manga"
     ],
     "questions": [
       [
@@ -705,10 +746,17 @@
         "Scar",
         "Tim Marcoh",
         "Solf J. Kimblee"
+      ],
+      [
+        "Em Brotherhood, qual homúnculo é a identidade de King Bradley?",
+        "Ira (Wrath)",
+        "Orgulho (Pride)",
+        "Inveja (Envy)",
+        "Ganância (Greed)"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "Attack on Titan — Além das Muralhas",
@@ -717,7 +765,8 @@
     "category": "SHONEN",
     "sources": [
       "https://en.wikipedia.org/wiki/List_of_Attack_on_Titan_characters",
-      "https://en.wikipedia.org/wiki/Attack_on_Titan"
+      "https://en.wikipedia.org/wiki/Attack_on_Titan",
+      "https://attackontitan.fandom.com/wiki/Historia_Reiss_(Anime)"
     ],
     "questions": [
       [
@@ -824,10 +873,17 @@
         "Maria",
         "Rose",
         "Todas ficam na mesma posição"
+      ],
+      [
+        "Qual é a verdadeira identidade da recruta conhecida como Krista Lenz?",
+        "Historia Reiss",
+        "Annie Leonhart",
+        "Pieck Finger",
+        "Yelena"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   },
   {
     "title": "Death Note — Jogo de Investigação",
@@ -836,7 +892,8 @@
     "category": "SHONEN",
     "sources": [
       "https://en.wikipedia.org/wiki/List_of_Death_Note_characters",
-      "https://en.wikipedia.org/wiki/Death_Note"
+      "https://en.wikipedia.org/wiki/Death_Note",
+      "https://deathnote.fandom.com/wiki/Rules_of_the_Death_Note"
     ],
     "questions": [
       [
@@ -943,10 +1000,16 @@
         "Kiyomi Takada",
         "Misa Amane",
         "Sachiko Yagami"
+      ],
+      [
+        "Após escrever a causa da morte, quanto tempo há para registrar seus detalhes no caderno?",
+        "6 minutos e 40 segundos",
+        "40 segundos",
+        "13 dias",
+        "24 horas"
       ]
     ],
     "language": "pt-BR",
-    "reviewedAt": "2026-11-19"
+    "reviewedAt": "2026-11-26"
   }
 ]
-
