@@ -98,6 +98,8 @@ Atrás de proxy, vários usuários podem compartilhar o IP remoto observado. Con
 
 ## Swagger e validação
 
+Revisão adicional de upload (19/11/2026): a suíte padrão descobriu 304 testes, com 302 aprovados e 2 HTTP opcionais ignorados, sem falhas/erros. AvatarHttpIntegrationTest usa Tomcat em porta aleatória e multipart PUT real, testa leitura autenticada e 413. Execute `mvnw.cmd -Danimequiz.http-tests=true test` para habilitar. A tentativa neste ambiente foi bloqueada na criação da conexão loopback, então esses dois cenários não foram homologados aqui. Os contratos de avatar via MockMvc permanecem cobertos pela suíte padrão.
+
 Tokens JWT inválidos/expirados e sessão ausente retornam APIError em JSON, HTTP 401 e WWW-Authenticate: Bearer, incluindo o filtro OAuth2. O schema de erro não herda o payload de sucesso.
 
 A apresentação customizada introduzida em e5805bc e preservada em 6f2d815 foi restaurada exclusivamente para V2, com o mesmo CSS, paleta e fundo. V1 continua usando os recursos padrão do Swagger, sem injetar o CSS ou o vídeo da V2.
