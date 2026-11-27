@@ -43,6 +43,7 @@ public class QuizService {
         }
 
         Quiz quiz = new Quiz(request.title(), request.description(), request.difficulty(), request.category());
+        applyDetails(quiz, request);
         // Um quiz recém-criado ainda não tem questões.
         return toResponse(quizRepository.save(quiz), 0L);
     }
@@ -80,6 +81,7 @@ public class QuizService {
         quiz.setDescription(request.description());
         quiz.setDifficulty(request.difficulty());
         quiz.setCategory(request.category());
+        applyDetails(quiz, request);
         Quiz saved = quizRepository.save(quiz);
         return toResponse(saved, questionRepository.countByQuizId(saved.getId()));
     }
@@ -100,6 +102,13 @@ public class QuizService {
             throw new ConflictException("Não é possível deletar quiz que está nos favoritos de algum usuário");
         }
         quizRepository.deleteById(id);
+    }
+
+    private static void applyDetails(Quiz quiz, QuizRequest request) {
+        quiz.setImageUrl(request.imageUrl());
+        quiz.setImageAltText(request.imageAltText());
+        quiz.setEnglishTitle(request.englishTitle());
+        quiz.setEnglishDescription(request.englishDescription());
     }
 
     private Quiz findQuizOrThrow(Long id) {

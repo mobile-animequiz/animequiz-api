@@ -20,5 +20,8 @@ public record OptionRequest(
         String text,
 
         @NotNull(message = "Deve indicar se a opção está correta ou não")
-        Boolean isCorrect
-) {}
+        Boolean isCorrect,
+        @Size(max = 150) String englishText
+) {
+    public OptionRequest(Long questionId, String text, Boolean isCorrect) { this(questionId, text, isCorrect, null); }
+}

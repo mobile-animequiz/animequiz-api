@@ -28,6 +28,9 @@ public class Option {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
+    @Column(length = 150)
+    private String englishText;
+
     public Option() {}
     public Option(Question question, String text, Boolean correct) {
         this.question = question;
@@ -51,4 +54,6 @@ public class Option {
 
     public Question getQuestion() { return question; }
     public void setQuestion(Question question) { this.question = question; }
+    public String getEnglishText() { return englishText; }
+    public void setEnglishText(String value) { englishText = value; }
 }

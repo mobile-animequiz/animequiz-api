@@ -20,5 +20,15 @@ public record QuizRequest(
         Difficulty difficulty,
 
         @NotNull(message = "A categoria é obrigatória")
-        Category category
-) {}
+        Category category,
+        @Size(max = 1000)
+        @jakarta.validation.constraints.Pattern(regexp = "https://[^\\s]+", message = "Use HTTPS for the quiz cover")
+        String imageUrl,
+        @Size(max = 255) String imageAltText,
+        @Size(max = 100) String englishTitle,
+        @Size(max = 255) String englishDescription
+) {
+    public QuizRequest(String title, String description, Difficulty difficulty, Category category) {
+        this(title, description, difficulty, category, null, null, null, null);
+    }
+}

@@ -1,5 +1,7 @@
 # AnimeQuiz API
 
+> Revisão integrada de 26/11/2026: consulte [o guia da evolução](docs/EVOLUCAO_2026-11-26.md) para admin local, criação de conteúdo, idiomas, capas e tempos. A documentação específica e independente da V1 está em [README_V1.md](README_V1.md). O app desta revisão usa o contrato 2.
+
 API REST em **Java 17 e Spring Boot** para consultar quizzes de anime, responder perguntas e acompanhar a evolução do jogador. A API corrige as respostas e calcula os pontos no servidor; o aplicativo nunca recebe o gabarito.
 
 Esta revisão organiza o projeto para a apresentação acadêmica: **V1 básica e pública** e **V2 do jogador, com JWT, limites e permissões**. O CSS e as páginas visuais das duas documentações foram preservados.
@@ -41,7 +43,7 @@ Esta revisão organiza o projeto para a apresentação acadêmica: **V1 básica 
 
 - A V1 mostra somente consultas de catálogo e status. Não tem `apiKeyAuth`, `bearerAuth`, resposta 429 nem cabeçalhos de rate limit nessas consultas.
 - A V2 usa **um único esquema: JWT Bearer**. Cadastro e login são públicos para permitir a obtenção do token; o catálogo V2 e as ações privadas exigem autenticação.
-- CRUD administrativo, gestão de chaves, Google e recuperação de senha foram retirados da apresentação pública do Swagger. Os schemas sem uso também são removidos.
+- Gestão de chaves, Google e recuperação de senha ficam ocultos. O CRUD de quizzes, perguntas e alternativas está documentado na V2 e exige ADMIN. Os schemas sem uso também são removidos.
 - Usuário comum não cria, altera ou exclui conteúdo do catálogo, contas de terceiros nem pontuações. Trocar o cabeçalho para V1 não libera essas operações.
 - Um jogador pode consultar seu próprio resultado, mas não a pontuação privada de outra conta nem a listagem administrativa de todos os scores.
 - Links HATEOAS de alteração/exclusão e de administração não são oferecidos ao jogador. Eles também não aparecem nas consultas básicas da V1.
@@ -239,7 +241,7 @@ Exemplo de item de quiz, sem o envelope de paginação:
   "description": "Descrição do quiz",
   "difficulty": "FACIL",
   "category": "SHONEN",
-  "questionCount": 15
+  "questionCount": 16
 }
 ```
 
@@ -357,7 +359,7 @@ Respostas 401 usam `WWW-Authenticate: Bearer`. Nem todo endpoint devolve todos e
 
 ## Banco e catálogo
 
-O H2 padrão grava em `./data/animequizdb`. O catálogo inicial completa **8 quizzes com 15 perguntas cada**, sem duplicar os registros já existentes. O seed preserva IDs e o histórico de scores; não cria uma conta ADMIN de demonstração.
+O H2 padrão grava em `./data/animequizdb`. O catálogo inicial completa **8 quizzes com 16 perguntas cada**, em português e inglês, sem duplicar registros. Preserva IDs e o histórico de scores. Um inicializador separado cria ADMIN somente em local/dev com senha definida no ambiente; consulte [a configuração local](docs/EVOLUCAO_2026-11-26.md).
 
 Para persistir entre deploys, configure `DB_URL` em um volume durável. H2 em arquivo é destinado a uma instância, não a várias réplicas compartilhando o arquivo. O schema usa Hibernate update, sem migrações Flyway. Faça backup antes de trocar o datasource. Uma base antiga em memória não é automaticamente transferida para arquivo.
 
@@ -450,8 +452,8 @@ Testes verificam separação dos documentos, ausência de chave de API, rate lim
 
 ## Compatibilidade e recursos ocultados
 
-Esta entrega altera a **API fornecida no ZIP**. Não contém uma nova versão do mobile ou APK. O catálogo V1 mantém o formato usado pelo app e os endpoints de conta continuam protegidos para compatibilidade com clientes que ainda enviam cabeçalho 1.
+Esta revisão é integrada ao mobile 1.2.0, que usa o contrato 2. Não foi gerado APK nesta etapa. O catálogo V1 mantém o formato básico e os endpoints de conta continuam protegidos para compatibilidade com clientes que ainda enviam cabeçalho 1.
 
-Google, recuperação de senha e integrações de e-mail continuam no código para evolução futura, mas não aparecem nos documentos públicos desta apresentação. `/api-keys/**` fica bloqueado e não é um segundo mecanismo de login. O CRUD administrativo permanece reservado ao operador ADMIN e oculto do Swagger do jogador.
+Google, recuperação de senha e integrações de e-mail continuam no código para evolução futura, mas não aparecem nos documentos públicos desta apresentação. `/api-keys/**` fica bloqueado e não é um segundo mecanismo de login. O CRUD administrativo permanece reservado ao operador ADMIN e documentado na V2 com exigência de ADMIN.
 
 Os arquivos de relatórios anteriores são históricos. Para as permissões e os exemplos atuais, use este README e os documentos `/api-docs/v1` e `/api-docs/v2` gerados pela aplicação em execução.

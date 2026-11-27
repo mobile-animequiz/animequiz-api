@@ -82,14 +82,15 @@ public class QuizQuestionController {
     }
 
     @GetMapping(headers = "X-API-Version=2")
-    @Operation(summary = "Listar questões V2 com imagens e tempo sugerido",
+    @Operation(summary = "Listar perguntas traduzidas e tempo por dificuldade",
             description = "Envie X-API-Version: 2. Acrescenta imageUrl, imageAltText e timeLimitSeconds ao contrato V1. "
                     + "Mídia ausente é null. A imagem não altera a pontuação. O tempo é uma sugestão para a interface; "
-                    + "a API não valida velocidade. Acesso público, paginação e ausência de gabarito iguais à V1. "
+                    + "a API não valida velocidade. Exige JWT. lang aceita pt-BR ou en; perguntas sem tradução completa usam pt-BR. "
                     + "Quiz inexistente retorna 404; sem questões retorna lista vazia com 200.")
     public ResponseEntity<PagedModel<EntityModel<QuestionWithMediaResponse>>> getQuizQuestionsV2(
-            @PathVariable Long quizId, @ParameterObject Pageable pageable) {
-        var page = questionService.getQuestionsWithMediaByQuizId(quizId, pageable);
+            @PathVariable Long quizId, @ParameterObject Pageable pageable,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "pt-BR") String lang) {
+        var page = questionService.getQuestionsWithMediaByQuizId(quizId, pageable, lang);
         return ResponseEntity.ok(mediaAssembler.toModel(page,
                 question -> EntityModel.of(question,
                         linkTo(methodOn(QuestionController.class).getQuestionById(question.id())).withSelfRel())));

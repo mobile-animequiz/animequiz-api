@@ -69,6 +69,23 @@ class AccountFeaturesIntegrationTest {
         mvc.perform(get("/users/me/settings")).andExpect(status().isUnauthorized());
         mvc.perform(get("/users/me/favorites?page=-1").header("Authorization","Bearer "+token)).andExpect(status().isBadRequest());
     }
+    @Test void allAdvertisedAppearanceChoicesPassHttpValidationAndPersist() throws Exception {
+        Session a=register();
+        for (String theme : List.of("midnight","eclipse","ocean","forest")) {
+            for (String accent : List.of("violet","cyan","rose","amber","mint","coral")) {
+                mvc.perform(patch("/users/me/settings").header("Authorization","Bearer "+a.token())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json.writeValueAsString(Map.of("theme",theme,"accent",accent))))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.theme").value(theme))
+                    .andExpect(jsonPath("$.accent").value(accent));
+                mvc.perform(get("/users/me/settings").header("Authorization","Bearer "+a.token()))
+                    .andExpect(jsonPath("$.theme").value(theme)).andExpect(jsonPath("$.accent").value(accent));
+            }
+        }
+        mvc.perform(patch("/users/me/settings").header("Authorization","Bearer "+a.token())
+            .contentType(MediaType.APPLICATION_JSON).content("{\"theme\":\"unknown\"}"))
+            .andExpect(status().isBadRequest());
+    }
     @Test void avatarRequiresAuthenticationValidatesContentAndCanBeRemoved() throws Exception {
         Session a=register();
         var output=new ByteArrayOutputStream();ImageIO.write(new BufferedImage(2,2,BufferedImage.TYPE_INT_RGB),"png",output);

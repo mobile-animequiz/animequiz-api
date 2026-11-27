@@ -92,7 +92,7 @@ public class SecurityConfig {
                                 "/reset-password.html", "/reset-password.js", "/reset-password.css",
                                 "/", "/docs", "/docs/v1", "/docs/v2", "/docs-v2.html", "/docs-version-switch.js",
                                 "/api-docs", "/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs.html",
-                                "/h2-console/**").permitAll()
+                                "/h2-console/**", "/media/quizzes/**").permitAll()
                         .requestMatchers("/api/versioned/status").permitAll()
                         .requestMatchers("/api-keys/**").denyAll()
                         .requestMatchers("/users/me").authenticated()

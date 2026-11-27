@@ -28,9 +28,23 @@ public class CatalogInitializer implements ApplicationRunner {
         try(var input=new ClassPathResource("catalog/pt-BR.json").getInputStream()) {
             catalog=json.readValue(input,CatalogQuiz[].class);
         }
+        CatalogQuiz[] english;
+        try (var input = new ClassPathResource("catalog/en.json").getInputStream()) {
+            english = json.readValue(input, CatalogQuiz[].class);
+        }
+        if (english.length != catalog.length) throw new IllegalStateException("Incomplete bilingual catalogue");
+        String[] covers = {"naruto", "one-piece", "dragon-ball", "demon-slayer", "my-hero", "fullmetal", "attack-on-titan", "death-note"};
+        int catalogIndex = 0;
         for(CatalogQuiz entry:catalog) {
+            CatalogQuiz translated = english[catalogIndex];
             Quiz quiz=quizzes.findByTitleIgnoreCase(entry.title()).orElseGet(() ->
                 quizzes.save(new Quiz(entry.title(),entry.description(),entry.difficulty(),entry.category())));
+            if (quiz.getEnglishTitle() == null) quiz.setEnglishTitle(translated.title());
+            if (quiz.getEnglishDescription() == null) quiz.setEnglishDescription(translated.description());
+            if (quiz.getImageUrl() == null) {
+                quiz.setImageUrl("/media/quizzes/" + covers[catalogIndex] + ".png");
+                quiz.setImageAltText(entry.title());
+            }
             List<Question> existing=questions.findAllByQuizId(quiz.getId());
             Set<String> statements=new HashSet<>();
             for(Question question:existing) {
@@ -43,7 +57,7 @@ public class CatalogInitializer implements ApplicationRunner {
             }
             int size=existing.size();
             for(List<String> row:entry.questions()) {
-                if(size>=15) break; // Preserve custom questions, identities and historical attempts.
+                if(size>=entry.questions().size()) break; // Preserve custom questions, identities and historical attempts.
                 if(row.size()!=5 || new HashSet<>(row.subList(1,5)).size()!=4)
                     throw new IllegalStateException("Catálogo com alternativas inválidas");
                 if(!statements.add(normalize(row.get(0)))) continue;
@@ -53,6 +67,21 @@ public class CatalogInitializer implements ApplicationRunner {
                 for(String choice:choices) options.save(new Option(question,choice,choice.equals(row.get(1))));
                 size++;
             }
+            // Fill missing translations only; retain custom edits and stable question/option IDs.
+            Map<String, Question> byText = new HashMap<>();
+            questions.findAllByQuizId(quiz.getId()).forEach(question -> byText.put(normalize(question.getText()), question));
+            for (int i = 0; i < entry.questions().size(); i++) {
+                List<String> original = entry.questions().get(i);
+                List<String> target = translated.questions().get(i);
+                Question question = byText.get(normalize(original.get(0)));
+                if (question == null) continue;
+                if (question.getEnglishText() == null) question.setEnglishText(target.get(0));
+                for (Option option : options.findByQuestionIdOrderByIdAsc(question.getId(), org.springframework.data.domain.Pageable.unpaged())) {
+                    int position = original.indexOf(option.getText());
+                    if (position > 0 && option.getEnglishText() == null) option.setEnglishText(target.get(position));
+                }
+            }
+            catalogIndex++;
         }
     }
     private String normalize(String value) { return value.strip().toLowerCase(Locale.ROOT).replaceAll("\\s+"," "); }

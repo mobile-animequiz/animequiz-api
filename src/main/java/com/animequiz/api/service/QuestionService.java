@@ -75,27 +75,23 @@ public class QuestionService {
      */
     @Transactional(readOnly = true)
     public Page<QuestionWithOptionsResponse> getQuestionsWithOptionsByQuizId(Long quizId, Pageable pageable) {
-        if (!quizRepository.existsById(quizId)) {
-            throw new ResourceNotFoundException("Quiz não encontrado com ID: " + quizId);
-        }
-        Page<Question> page = questionRepository.findByQuizIdOrderByIdAsc(quizId, pageable);
+        QuestionPage data = playable(quizId, pageable);
+        return data.page().map(question -> new QuestionWithOptionsResponse(question.getId(), quizId,
+            question.getQuiz().getTitle(), question.getText(), data.options().getOrDefault(question.getId(), List.of())
+                .stream().map(option -> new OptionSummaryResponse(option.getId(), option.getText())).toList()));
+    }
 
-        List<Long> questionIds = page.getContent().stream().map(Question::getId).toList();
-        Map<Long, List<OptionSummaryResponse>> optionsByQuestion = new HashMap<>();
-        if (!questionIds.isEmpty()) {
-            for (OptionView option : optionRepository.findViewsByQuestionIds(questionIds)) {
-                optionsByQuestion
-                        .computeIfAbsent(option.getQuestionId(), id -> new ArrayList<>())
-                        .add(new OptionSummaryResponse(option.getId(), option.getText()));
+    private record QuestionPage(Page<Question> page, Map<Long, List<OptionView>> options) { }
+    private QuestionPage playable(Long quizId, Pageable pageable) {
+        if (!quizRepository.existsById(quizId)) throw new ResourceNotFoundException("Quiz não encontrado com ID: " + quizId);
+        Page<Question> page = questionRepository.findByQuizIdOrderByIdAsc(quizId, pageable);
+        Map<Long, List<OptionView>> options = new HashMap<>();
+        if (!page.isEmpty()) {
+            for (OptionView option : optionRepository.findViewsByQuestionIds(page.map(Question::getId).getContent())) {
+                options.computeIfAbsent(option.getQuestionId(), key -> new ArrayList<>()).add(option);
             }
         }
-
-        return page.map(question -> new QuestionWithOptionsResponse(
-                question.getId(),
-                question.getQuiz().getId(),
-                question.getQuiz().getTitle(),
-                question.getText(),
-                optionsByQuestion.getOrDefault(question.getId(), List.of())));
+        return new QuestionPage(page, options);
     }
 
     @Transactional
@@ -136,18 +132,30 @@ public class QuestionService {
 
     @Transactional(readOnly = true)
     public Page<QuestionWithMediaResponse> getQuestionsWithMediaByQuizId(Long quizId, Pageable pageable) {
-        Page<QuestionWithOptionsResponse> page = getQuestionsWithOptionsByQuizId(quizId, pageable);
-        Map<Long, Question> media = new HashMap<>();
-        questionRepository.findAllById(page.getContent().stream().map(QuestionWithOptionsResponse::id).toList())
-                .forEach(question -> media.put(question.getId(), question));
-        return page.map(question -> {
-            Question stored = media.get(question.id());
-            return new QuestionWithMediaResponse(question.id(), question.quizId(), question.quizTitle(),
-                    question.text(), question.options(), stored.getImageUrl(), stored.getImageAltText(), stored.getTimeLimitSeconds());
+        return getQuestionsWithMediaByQuizId(quizId, pageable, "pt-BR");
+    }
+
+    @Transactional(readOnly = true)
+    public Page<QuestionWithMediaResponse> getQuestionsWithMediaByQuizId(Long quizId, Pageable pageable, String language) {
+        String lang = ContentLanguage.validate(language);
+        QuestionPage data = playable(quizId, pageable);
+        return data.page().map(question -> {
+            var choices = data.options().getOrDefault(question.getId(), List.of());
+            boolean english = "en".equals(lang) && question.getEnglishText() != null && !question.getEnglishText().isBlank()
+                && choices.stream().allMatch(option -> option.getEnglishText() != null && !option.getEnglishText().isBlank());
+            String actual = english ? "en" : "pt-BR";
+            return new QuestionWithMediaResponse(question.getId(), quizId,
+                ContentLanguage.text(question.getQuiz().getTitle(), question.getQuiz().getEnglishTitle(), actual),
+                ContentLanguage.text(question.getText(), question.getEnglishText(), actual),
+                choices.stream().map(option -> new OptionSummaryResponse(option.getId(),
+                    ContentLanguage.text(option.getText(), option.getEnglishText(), actual))).toList(),
+                question.getImageUrl(), question.getImageAltText(),
+                Math.min(question.getTimeLimitSeconds(), QuizRules.seconds(question.getQuiz().getDifficulty())), actual);
         });
     }
 
     private static void applyMedia(Question question, QuestionRequest request) {
+        question.setEnglishText(request.englishText());
         question.setImageUrl(request.imageUrl());
         question.setImageAltText(request.imageAltText());
         question.setTimeLimitSeconds(request.timeLimitSeconds() == null ? 30 : request.timeLimitSeconds());
