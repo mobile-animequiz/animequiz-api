@@ -1,5 +1,7 @@
 # AnimeQuiz API
 
+> Login do administrador no servidor publicado: veja [como provisionar a conta no Render](docs/ADMIN_RENDER.md). O admin de demonstração local não é criado automaticamente em produção.
+
 > Revisão integrada de 26/11/2026: consulte [o guia da evolução](docs/EVOLUCAO_2026-11-26.md) para admin local, criação de conteúdo, idiomas, capas e tempos. A documentação específica e independente da V1 está em [README_V1.md](README_V1.md). O app desta revisão usa o contrato 2.
 
 API REST em **Java 17 e Spring Boot** para consultar quizzes de anime, responder perguntas e acompanhar a evolução do jogador. A API corrige as respostas e calcula os pontos no servidor; o aplicativo nunca recebe o gabarito.
