@@ -4,14 +4,16 @@
 
 | Verificação | Resultado |
 |---|---|
-| Testes Java JUnit/MockMvc/JPA/HTTP | 308 aprovados, zero falhas/erros/ignorados |
+| Testes Java JUnit/MockMvc/JPA/HTTP | 321 aprovados, zero falhas/erros/ignorados |
 | Navegação da documentação, Node | 4 aprovados |
 | Testes do mobile | 36 aprovados |
 | Mobile: lint sem cache e TypeScript | Aprovados |
 | Exportação web do mobile | Concluída |
 | Configuração de APK e recursos existentes | Validada; não é um APK gerado |
 
-A suíte final foi executada com os testes HTTP opcionais habilitados: 308 testes sem ignorados. O código foi compilado com alvo Java 17, usando o JDK completo do Android Studio disponível neste ambiente.
+A suíte final foi executada com os testes HTTP opcionais habilitados: 321 testes sem ignorados. O código foi compilado com alvo Java 17, usando o JDK completo do Android Studio disponível neste ambiente.
+
+A correção de provisionamento no Render acrescentou 13 verificações: bootstrap desativado por padrão, senha BCrypt, idempotência, contas existentes preservadas sem autorização explícita, promoção/reset com revogação de sessões, validação de senha/e-mail e colisão de nome. A integração com perfil prod confirmou login e criação de quiz pelo ADMIN, além do bloqueio de criação para USER. As variáveis reais do Render ainda precisam ser definidas pelo operador; os testes não alteraram o servidor publicado.
 
 Foram exercitados: separação dos documentos V1/V2, DTO básico independente, validação de versão/idioma, autorização ADMIN/USER, idempotência do seed local, hash BCrypt e bloqueio do seed em prod, catálogo bilingue com IDs estáveis, mídia PNG, pontuação/XP, favoritos, upload multipart real e validações de imagem.
 
